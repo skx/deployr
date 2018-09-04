@@ -121,7 +121,7 @@ func copyFile(local string, remote string, expand bool) {
 		data, err := ioutil.ReadFile(local)
 
 		if err != nil {
-			log.Fatal("Failed to read local file to expand template-variables %s\n", err.Error())
+			fmt.Printf("Failed to read local file to expand template-variables %s\n", err.Error())
 			return
 		}
 
@@ -171,7 +171,7 @@ func copyFile(local string, remote string, expand bool) {
 	//
 	hashLocal, err := hashFile(local)
 	if err != nil {
-		log.Fatal("Failed to hash local file %s\n", err.Error())
+		fmt.Printf("Failed to hash local file %s\n", err.Error())
 		return
 	}
 
@@ -191,7 +191,7 @@ func copyFile(local string, remote string, expand bool) {
 		//
 		hashRemote, err := hashFile(tmpfile.Name())
 		if err != nil {
-			log.Fatal("Failed to hash remote file %s\n", err.Error())
+			fmt.Printf("Failed to hash remote file %s\n", err.Error())
 
 			// If expanding variables we replaced our
 			// input-file with the temporary result of
@@ -229,7 +229,7 @@ func copyFile(local string, remote string, expand bool) {
 	if changed == true {
 		err = client.Upload(local, remote)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Printf("Failed to upload '%s' to '%s': %s\n", local, remote, err.Error())
 
 			// If expanding variables we replaced our
 			// input-file with the temporary result of
@@ -324,7 +324,7 @@ func processFile(filename string) {
 	//
 	file, err := os.Open(filename)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Printf("Failed to open %s : %s\n", filename, err.Error())
 		return
 	}
 	defer file.Close()
@@ -399,7 +399,7 @@ func processFile(filename string) {
 			logMessage("Running command '%s'\n", cmd)
 			result, err := client.Exec(cmd)
 			if err != nil {
-				log.Fatal(err)
+				fmt.Printf("Failed to run command '%s': %s\n", cmd, err.Error())
 				break
 			}
 
@@ -425,7 +425,7 @@ func processFile(filename string) {
 				logMessage("Running command '%s'\n", cmd)
 				result, err := client.Exec(cmd)
 				if err != nil {
-					log.Fatal(err)
+					fmt.Printf("Failed to run command '%s': %s\n", cmd, err.Error())
 					break
 				}
 				fmt.Printf("%s", result)
