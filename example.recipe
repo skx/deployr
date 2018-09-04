@@ -1,0 +1,11 @@
+#
+# This is a simple recipe which shows how deployr could be used.
+#
+# Launch it like so:
+#
+#    deployr -target root@host.example.com ./example.recipe
+#
+
+CopyTemplate example.recipe.template /tmp/blah
+
+Run cat /tmp/blah
