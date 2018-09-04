@@ -76,7 +76,8 @@ The following snippet is a complete and valid example-file:
 
      #
      # Now that RELEASE is defined it can be used as ${RELEASE} in the rest of
-     # this file.
+     # this file.  If you wish to use it in a file-template which is copied
+     # you can access it as "{{get RELEASE}}".
      #
 
      #
