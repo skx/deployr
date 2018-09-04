@@ -6,7 +6,13 @@
 #    deployr -target root@host.example.com ./example.recipe
 #
 
+#
+# Set a variable
+#
+Set name World
 
+
+#
 #
 # This copies the file `example.recipe.template` to the remote host,
 # expanding any variables prior to the copy.
