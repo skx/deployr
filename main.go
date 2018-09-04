@@ -169,7 +169,7 @@ func copyFile(local string, remote string, expand bool) {
 	//
 	// NOTE: We do this after we've expanded any variables.
 	//
-	hash_local, err := hashFile(local)
+	hashLocal, err := hashFile(local)
 	if err != nil {
 		log.Fatal("Failed to hash local file %s\n", err.Error())
 		return
@@ -189,7 +189,7 @@ func copyFile(local string, remote string, expand bool) {
 		// We had no error - so we now have the
 		// remote file copied here.
 		//
-		hash_remote, err := hashFile(tmpfile.Name())
+		hashRemote, err := hashFile(tmpfile.Name())
 		if err != nil {
 			log.Fatal("Failed to hash remote file %s\n", err.Error())
 
@@ -202,7 +202,7 @@ func copyFile(local string, remote string, expand bool) {
 			return
 		}
 
-		if hash_remote != hash_local {
+		if hashRemote != hashLocal {
 			logMessage("\tFile on remote host needs replacing.\n")
 
 			changed = true
