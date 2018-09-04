@@ -330,173 +330,55 @@ func processFile(filename string) {
 	defer file.Close()
 
 	//
+	// We read into this string.
+	//
+	line := ""
+
+	//
 	// Process the file line-by-line
 	//
 	scanner := bufio.NewScanner(file)
+
+	//
+	// Loop
+	//
 	for scanner.Scan() {
 
 		//
-		// The line we read.
+		// Get the line, and strip leading/trailing space.
 		//
-		line := scanner.Text()
+		tmp := scanner.Text()
+		tmp = strings.TrimSpace(tmp)
 
 		//
-		// Expand any variables which have previously been
-		// declared.
+		// Append to our existing line.
 		//
-		re := regexp.MustCompile("\\$\\{([^\\}]+)\\}")
-		line = re.ReplaceAllStringFunc(line, func(in string) string {
-
-			in = strings.TrimPrefix(in, "${")
-			in = strings.TrimSuffix(in, "}")
-
-			if len(variables[in]) > 0 {
-				return (variables[in])
-			}
-			return "${" + in + "}"
-		})
+		line += tmp
 
 		//
-		// Now split the line into tokens, post-expansion.
+		// If the line ends with "\" then we remove
+		// that character, and repeat.
 		//
-		tokens := strings.Fields(line)
-
-		//
-		// Process each line
-		//
-		if line == "" {
-			//
-			// Skip any empty lines.
-			//
-		} else if strings.HasPrefix(line, "#") {
-
-			//
-			// Comments are prefixed with "#"
-			//
+		if strings.HasSuffix(line, "\\") {
+			line = strings.TrimSuffix(line, "\\")
 			continue
-		} else if strings.HasPrefix(line, "DeployTo") {
-
-			//
-			// DeployTo sets the target to connect to
-			//
-			connectToHost(tokens[1])
-		} else if strings.HasPrefix(line, "Run") {
-
-			//
-			// Ensure we're connected
-			//
-			if client == nil {
-				fmt.Printf("Not connected - either add 'DeployTo' to your recipe, or pass a system via\n")
-				fmt.Printf("--target=[user@]host.example.com[:port]\n")
-				continue
-			}
-
-			//
-			// Run runs a command.  Unconditionally
-			//
-			cmd := strings.TrimPrefix(line, "Run ")
-
-			logMessage("Running command '%s'\n", cmd)
-			result, err := client.Exec(cmd)
-			if err != nil {
-				fmt.Printf("Failed to run command '%s': %s\n", cmd, err.Error())
-				break
-			}
-
-			fmt.Printf("%s", result)
-		} else if strings.HasPrefix(line, "IfChanged") {
-
-			//
-			// Ensure we're connected
-			//
-			if client == nil {
-				fmt.Printf("Not connected - either add 'DeployTo' to your recipe, or pass a system via\n")
-				fmt.Printf("--target=[user@]host.example.com[:port]\n")
-				continue
-			}
-
-			//
-			// IfChanged runs a command only if the
-			// previous CopyFile resulted in a change.
-			//
-			cmd := strings.TrimPrefix(line, "IfChanged ")
-
-			if changed == true {
-				logMessage("Running command '%s'\n", cmd)
-				result, err := client.Exec(cmd)
-				if err != nil {
-					fmt.Printf("Failed to run command '%s': %s\n", cmd, err.Error())
-					break
-				}
-				fmt.Printf("%s", result)
-			} else {
-				logMessage("Skipping command - previous copy operation didn't result in a change - %s\n", cmd)
-			}
-		} else if strings.HasPrefix(line, "CopyTemplate") {
-
-			//
-			// Ensure we're connected
-			//
-			if client == nil {
-				fmt.Printf("Not connected - either add 'DeployTo' to your recipe, or pass a system via\n")
-				fmt.Printf("--target=[user@]host.example.com[:port]\n")
-				continue
-			}
-
-			//
-			// Local filename
-			//
-			local := tokens[1]
-
-			//
-			// Remote target.
-			//
-			remote := tokens[2]
-
-			logMessage("Copying local file '%s' to remote file '%s'\n", local, remote)
-
-			copyFile(local, remote, true)
-
-		} else if strings.HasPrefix(line, "CopyFile") {
-
-			//
-			// Ensure we're connected
-			//
-			if client == nil {
-				fmt.Printf("Not connected - either add 'DeployTo' to your recipe, or pass a system via\n")
-				fmt.Printf("--target=[user@]host.example.com[:port]\n")
-				continue
-			}
-
-			//
-			// Local filename
-			//
-			local := tokens[1]
-
-			//
-			// Remote target.
-			//
-			remote := tokens[2]
-
-			logMessage("Copying local file '%s' to remote file '%s'\n", local, remote)
-
-			copyFile(local, remote, false)
-		} else if strings.HasPrefix(line, "Set") {
-
-			//
-			// Set sets a variable
-			//
-			key := tokens[1]
-			val := tokens[2]
-
-			logMessage("Set variable '%s' to '%s'\n", key, val)
-
-			variables[key] = val
-
-		} else {
-			fmt.Printf("Unknown input in file: %s\n", line)
-			os.Exit(99)
 		}
+
+		//
+		// OK we've got a normal line
+		//
+		line = strings.TrimSpace(line)
+
+		//
+		// Process it
+		//
+		processInput(line)
+
+		//
+		// Reset for next time.
+		//
+		line = ""
+
 	}
 
 	//
@@ -513,6 +395,168 @@ func processFile(filename string) {
 	if client != nil {
 		client.Close()
 	}
+}
+
+// processInput processes a single line of input from our
+// recipe-file
+func processInput(line string) {
+
+	//
+	// Expand any variables which have previously been
+	// declared.
+	//
+	re := regexp.MustCompile("\\$\\{([^\\}]+)\\}")
+	line = re.ReplaceAllStringFunc(line, func(in string) string {
+
+		in = strings.TrimPrefix(in, "${")
+		in = strings.TrimSuffix(in, "}")
+
+		if len(variables[in]) > 0 {
+			return (variables[in])
+		}
+		return "${" + in + "}"
+	})
+
+	//
+	// Now split the line into tokens, post-expansion.
+	//
+	tokens := strings.Fields(line)
+
+	//
+	// Process each line
+	//
+	if line == "" {
+		//
+		// Skip any empty lines.
+		//
+	} else if strings.HasPrefix(line, "#") {
+
+		//
+		// Comments are prefixed with "#"
+		//
+		return
+	} else if strings.HasPrefix(line, "DeployTo") {
+
+		//
+		// DeployTo sets the target to connect to
+		//
+		connectToHost(tokens[1])
+	} else if strings.HasPrefix(line, "Run") {
+
+		//
+		// Ensure we're connected
+		//
+		if client == nil {
+			fmt.Printf("Not connected - either add 'DeployTo' to your recipe, or pass a system via\n")
+			fmt.Printf("--target=[user@]host.example.com[:port]\n")
+			return
+		}
+
+		//
+		// Run runs a command.  Unconditionally
+		//
+		cmd := strings.TrimPrefix(line, "Run ")
+
+		logMessage("Running command '%s'\n", cmd)
+		result, err := client.Exec(cmd)
+		if err != nil {
+			fmt.Printf("Failed to run command '%s': %s\n", cmd, err.Error())
+		}
+
+		fmt.Printf("%s", result)
+	} else if strings.HasPrefix(line, "IfChanged") {
+
+		//
+		// Ensure we're connected
+		//
+		if client == nil {
+			fmt.Printf("Not connected - either add 'DeployTo' to your recipe, or pass a system via\n")
+			fmt.Printf("--target=[user@]host.example.com[:port]\n")
+			return
+		}
+
+		//
+		// IfChanged runs a command only if the
+		// previous CopyFile resulted in a change.
+		//
+		cmd := strings.TrimPrefix(line, "IfChanged ")
+
+		if changed == true {
+			logMessage("Running command '%s'\n", cmd)
+			result, err := client.Exec(cmd)
+			if err != nil {
+				fmt.Printf("Failed to run command '%s': %s\n", cmd, err.Error())
+			}
+			fmt.Printf("%s", result)
+		} else {
+			logMessage("Skipping command - previous copy operation didn't result in a change - %s\n", cmd)
+		}
+	} else if strings.HasPrefix(line, "CopyTemplate") {
+
+		//
+		// Ensure we're connected
+		//
+		if client == nil {
+			fmt.Printf("Not connected - either add 'DeployTo' to your recipe, or pass a system via\n")
+			fmt.Printf("--target=[user@]host.example.com[:port]\n")
+			return
+		}
+
+		//
+		// Local filename
+		//
+		local := tokens[1]
+
+		//
+		// Remote target.
+		//
+		remote := tokens[2]
+
+		logMessage("Copying local file '%s' to remote file '%s'\n", local, remote)
+
+		copyFile(local, remote, true)
+
+	} else if strings.HasPrefix(line, "CopyFile") {
+
+		//
+		// Ensure we're connected
+		//
+		if client == nil {
+			fmt.Printf("Not connected - either add 'DeployTo' to your recipe, or pass a system via\n")
+			fmt.Printf("--target=[user@]host.example.com[:port]\n")
+			return
+		}
+
+		//
+		// Local filename
+		//
+		local := tokens[1]
+
+		//
+		// Remote target.
+		//
+		remote := tokens[2]
+
+		logMessage("Copying local file '%s' to remote file '%s'\n", local, remote)
+
+		copyFile(local, remote, false)
+	} else if strings.HasPrefix(line, "Set") {
+
+		//
+		// Set sets a variable
+		//
+		key := tokens[1]
+		val := tokens[2]
+
+		logMessage("Set variable '%s' to '%s'\n", key, val)
+
+		variables[key] = val
+
+	} else {
+		fmt.Printf("Unknown input in file: %s\n", line)
+		os.Exit(99)
+	}
+
 }
 
 // main is our entry-point
