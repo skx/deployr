@@ -50,7 +50,7 @@ var variables map[string]string
 //
 // Are we running verbosely?
 //
-var g_verbose bool
+var gVerbose bool
 
 //
 // Did the last upload change the remote file?
@@ -61,7 +61,7 @@ var changed bool
 // Show a message if running verbosely
 //
 func log_message(format string, args ...interface{}) {
-	if g_verbose == true {
+	if gVerbose == true {
 		str := fmt.Sprintf(format, args...)
 		fmt.Fprintf(os.Stderr, "%v", str)
 	}
@@ -534,7 +534,7 @@ func main() {
 	//
 	// Save the global verbosity-flag.
 	//
-	g_verbose = *verbose
+	gVerbose = *verbose
 
 	//
 	// If we received a target then connect now.
