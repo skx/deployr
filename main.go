@@ -38,7 +38,7 @@ import (
 )
 
 //
-// The SSH-client conneciton
+// The SSH-client connection.
 //
 var client *simplessh.Client
 
@@ -58,7 +58,7 @@ var gVerbose bool
 var changed bool
 
 //
-// Show a message if running verbosely
+// logMessage shows a message only if running verbosely.
 //
 func logMessage(format string, args ...interface{}) {
 	if gVerbose == true {
@@ -68,9 +68,9 @@ func logMessage(format string, args ...interface{}) {
 }
 
 //
-// hash_file returns the SHA1-hash of the contents of the specified file.
+// hashFile returns the SHA1-hash of the contents of the specified file.
 //
-func hash_file(filePath string) (string, error) {
+func hashFile(filePath string) (string, error) {
 	var returnSHA1String string
 
 	file, err := os.Open(filePath)
@@ -169,7 +169,7 @@ func copyFile(local string, remote string, expand bool) {
 	//
 	// NOTE: We do this after we've expanded any variables.
 	//
-	hash_local, err := hash_file(local)
+	hash_local, err := hashFile(local)
 	if err != nil {
 		log.Fatal("Failed to hash local file %s\n", err.Error())
 		return
@@ -189,7 +189,7 @@ func copyFile(local string, remote string, expand bool) {
 		// We had no error - so we now have the
 		// remote file copied here.
 		//
-		hash_remote, err := hash_file(tmpfile.Name())
+		hash_remote, err := hashFile(tmpfile.Name())
 		if err != nil {
 			log.Fatal("Failed to hash remote file %s\n", err.Error())
 
@@ -254,7 +254,7 @@ func copyFile(local string, remote string, expand bool) {
 // The complete-form of the host-string might be:
 //   user@host:port
 //
-// But also "user@host", or "host:port" are acceptible.
+// But also "user@host", or "host:port" are acceptable.
 func connectToHost(str string) {
 	var err error
 
