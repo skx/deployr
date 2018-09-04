@@ -434,15 +434,16 @@ func processInput(line string) {
 	action := tokens[0]
 	args := strings.TrimSpace(strings.TrimPrefix(line, action))
 
-	fmt.Printf("LINE: '%s'\nAction:'%s' Args:'%s'\n", line, action, args)
-
 	//
 	// Process each line - looking at the action / first-token
 	//
 	if action == "DeployTo" {
 
 		//
-		// DeployTo sets the target to connect to
+		// DeployTo sets the target to connect to.
+		//
+		// Unless we already connected via the `--target`
+		// flag passed as an argument.
 		//
 		connectToHost(tokens[1])
 
@@ -460,14 +461,15 @@ func processInput(line string) {
 		//
 		// Run runs a command.  Unconditionally
 		//
-		cmd := strings.TrimPrefix(line, "Run ")
-
-		logMessage("Running command '%s'\n", cmd)
-		result, err := client.Exec(cmd)
+		logMessage("Running command '%s'\n", args)
+		result, err := client.Exec(args)
 		if err != nil {
-			fmt.Printf("Failed to run command '%s': %s\n", cmd, err.Error())
+			fmt.Printf("\tFailed to run command '%s': %s\n", args, err.Error())
 		}
 
+		//
+		// Show the output
+		//
 		fmt.Printf("%s", result)
 	} else if action == "IfChanged" {
 
@@ -484,17 +486,19 @@ func processInput(line string) {
 		// IfChanged runs a command only if the
 		// previous CopyFile resulted in a change.
 		//
-		cmd := strings.TrimPrefix(line, "IfChanged ")
-
 		if changed == true {
-			logMessage("Running command '%s'\n", cmd)
-			result, err := client.Exec(cmd)
+			logMessage("Running command '%s'\n", args)
+			result, err := client.Exec(args)
 			if err != nil {
-				fmt.Printf("Failed to run command '%s': %s\n", cmd, err.Error())
+				fmt.Printf("\tFailed to run command '%s': %s\n", args, err.Error())
 			}
+
+			//
+			// Show the output
+			//
 			fmt.Printf("%s", result)
 		} else {
-			logMessage("Skipping command - previous copy operation didn't result in a change - %s\n", cmd)
+			logMessage("Skipping command - previous copy operation didn't result in a change - %s\n", args)
 		}
 	} else if action == "CopyTemplate" {
 
@@ -551,13 +555,13 @@ func processInput(line string) {
 		// Set sets a variable.
 		//
 		// The value of the argument can have whitespace, but the
-		// name cannot.
+		// name cannot.  So we split on the first whitespace character.
 		//
 		reg := regexp.MustCompile("^([^ \t]+)\\s(.*)$")
 		out := reg.FindStringSubmatch(args)
 
 		//
-		// If it didn't then we have a malformed line
+		// Only set the value if we got the count we expected.
 		//
 		if len(out) == 3 {
 
