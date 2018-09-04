@@ -352,9 +352,8 @@ func processFile(filename string) {
 
 			if len(variables[in]) > 0 {
 				return (variables[in])
-			} else {
-				return "${" + in + "}"
 			}
+			return "${" + in + "}"
 		})
 
 		//
