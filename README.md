@@ -89,7 +89,7 @@ The following snippet is a complete and valid example-file:
      # Create a symlink from this versioned download to an unqualified name.
      #
      Run ln -sf /srv/puppet-summary/puppet-summary-linux-amd64-${RELEASE} \
-        /srv/puppet-summary/puppet-summary"
+        /srv/puppet-summary/puppet-summary
 
 
      #
