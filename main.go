@@ -60,7 +60,7 @@ var changed bool
 //
 // Show a message if running verbosely
 //
-func log_message(format string, args ...interface{}) {
+func logMessage(format string, args ...interface{}) {
 	if gVerbose == true {
 		str := fmt.Sprintf(format, args...)
 		fmt.Fprintf(os.Stderr, "%v", str)
@@ -203,11 +203,11 @@ func copyFile(local string, remote string, expand bool) {
 		}
 
 		if hash_remote != hash_local {
-			log_message("\tFile on remote host needs replacing.\n")
+			logMessage("\tFile on remote host needs replacing.\n")
 
 			changed = true
 		} else {
-			log_message("\tFile on remote host doesn't need to be changed.\n")
+			logMessage("\tFile on remote host doesn't need to be changed.\n")
 			changed = false
 		}
 	} else {
@@ -262,7 +262,7 @@ func connectToHost(str string) {
 		fmt.Printf("Ignoring request to change target mid-run!\n")
 		return
 	}
-	log_message("Deploying to %s\n", str)
+	logMessage("Deploying to %s\n", str)
 
 	//
 	// Default username + port
@@ -317,7 +317,7 @@ func connectToHost(str string) {
 //
 // Comments could be improved, obviously.
 func processFile(filename string) {
-	log_message("Processing recipe-file %s\n", filename)
+	logMessage("Processing recipe-file %s\n", filename)
 
 	//
 	// Open the file.
@@ -397,7 +397,7 @@ func processFile(filename string) {
 			//
 			cmd := strings.TrimPrefix(line, "Run ")
 
-			log_message("Running command '%s'\n", cmd)
+			logMessage("Running command '%s'\n", cmd)
 			result, err := client.Exec(cmd)
 			if err != nil {
 				log.Fatal(err)
@@ -423,7 +423,7 @@ func processFile(filename string) {
 			cmd := strings.TrimPrefix(line, "IfChanged ")
 
 			if changed == true {
-				log_message("Running command '%s'\n", cmd)
+				logMessage("Running command '%s'\n", cmd)
 				result, err := client.Exec(cmd)
 				if err != nil {
 					log.Fatal(err)
@@ -431,7 +431,7 @@ func processFile(filename string) {
 				}
 				fmt.Printf("%s", result)
 			} else {
-				log_message("Skipping command - previous copy operation didn't result in a change - %s\n", cmd)
+				logMessage("Skipping command - previous copy operation didn't result in a change - %s\n", cmd)
 			}
 		} else if strings.HasPrefix(line, "CopyTemplate") {
 
@@ -454,7 +454,7 @@ func processFile(filename string) {
 			//
 			remote := tokens[2]
 
-			log_message("Copying local file '%s' to remote file '%s'\n", local, remote)
+			logMessage("Copying local file '%s' to remote file '%s'\n", local, remote)
 
 			copyFile(local, remote, true)
 
@@ -479,7 +479,7 @@ func processFile(filename string) {
 			//
 			remote := tokens[2]
 
-			log_message("Copying local file '%s' to remote file '%s'\n", local, remote)
+			logMessage("Copying local file '%s' to remote file '%s'\n", local, remote)
 
 			copyFile(local, remote, false)
 		} else if strings.HasPrefix(line, "Set") {
@@ -490,7 +490,7 @@ func processFile(filename string) {
 			key := tokens[1]
 			val := tokens[2]
 
-			log_message("Set variable '%s' to '%s'\n", key, val)
+			logMessage("Set variable '%s' to '%s'\n", key, val)
 
 			variables[key] = val
 
