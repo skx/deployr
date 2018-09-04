@@ -9,7 +9,7 @@
 #
 # Set a variable
 #
-Set name World
+Set greeting Hello, world!
 
 
 #

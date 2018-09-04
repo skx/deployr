@@ -402,6 +402,16 @@ func processFile(filename string) {
 func processInput(line string) {
 
 	//
+	// Return early on empty-lines or comments
+	//
+	if line == "" {
+		return
+	}
+	if strings.HasPrefix(line, "#") {
+		return
+	}
+
+	//
 	// Expand any variables which have previously been
 	// declared.
 	//
@@ -418,30 +428,25 @@ func processInput(line string) {
 	})
 
 	//
-	// Now split the line into tokens, post-expansion.
+	// We now want to split the line into "action $arg1 $arg2 ..  $argN"
 	//
 	tokens := strings.Fields(line)
+	action := tokens[0]
+	args := strings.TrimSpace(strings.TrimPrefix(line, action))
+
+	fmt.Printf("LINE: '%s'\nAction:'%s' Args:'%s'\n", line, action, args)
 
 	//
-	// Process each line
+	// Process each line - looking at the action / first-token
 	//
-	if line == "" {
-		//
-		// Skip any empty lines.
-		//
-	} else if strings.HasPrefix(line, "#") {
-
-		//
-		// Comments are prefixed with "#"
-		//
-		return
-	} else if strings.HasPrefix(line, "DeployTo") {
+	if action == "DeployTo" {
 
 		//
 		// DeployTo sets the target to connect to
 		//
 		connectToHost(tokens[1])
-	} else if strings.HasPrefix(line, "Run") {
+
+	} else if action == "Run" {
 
 		//
 		// Ensure we're connected
@@ -464,7 +469,7 @@ func processInput(line string) {
 		}
 
 		fmt.Printf("%s", result)
-	} else if strings.HasPrefix(line, "IfChanged") {
+	} else if action == "IfChanged" {
 
 		//
 		// Ensure we're connected
@@ -491,7 +496,7 @@ func processInput(line string) {
 		} else {
 			logMessage("Skipping command - previous copy operation didn't result in a change - %s\n", cmd)
 		}
-	} else if strings.HasPrefix(line, "CopyTemplate") {
+	} else if action == "CopyTemplate" {
 
 		//
 		// Ensure we're connected
@@ -516,7 +521,7 @@ func processInput(line string) {
 
 		copyFile(local, remote, true)
 
-	} else if strings.HasPrefix(line, "CopyFile") {
+	} else if action == "CopyFile" {
 
 		//
 		// Ensure we're connected
@@ -540,17 +545,29 @@ func processInput(line string) {
 		logMessage("Copying local file '%s' to remote file '%s'\n", local, remote)
 
 		copyFile(local, remote, false)
-	} else if strings.HasPrefix(line, "Set") {
+	} else if action == "Set" {
 
 		//
-		// Set sets a variable
+		// Set sets a variable.
 		//
-		key := tokens[1]
-		val := tokens[2]
+		// The value of the argument can have whitespace, but the
+		// name cannot.
+		//
+		reg := regexp.MustCompile("^([^ \t]+)\\s(.*)$")
+		out := reg.FindStringSubmatch(args)
 
-		logMessage("Set variable '%s' to '%s'\n", key, val)
+		//
+		// If it didn't then we have a malformed line
+		//
+		if len(out) == 3 {
 
-		variables[key] = val
+			key := out[1]
+			val := out[2]
+
+			logMessage("Set variable '%s' to '%s'\n", key, val)
+
+			variables[key] = val
+		}
 
 	} else {
 		fmt.Printf("Unknown input in file: %s\n", line)
