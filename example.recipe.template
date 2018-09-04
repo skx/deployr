@@ -1,0 +1,5 @@
+This file was deployed to {{get "host" }} by deployr!
+
+Here you see a variable being used which was defined in the recipe itself:
+
+* {{get "greeting"}}
