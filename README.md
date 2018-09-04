@@ -1,3 +1,10 @@
+[![Travis CI](https://img.shields.io/travis/skx/deployr/master.svg?style=flat-square)](https://travis-ci.org/skx/deployr)
+[![Go Report Card](https://goreportcard.com/badge/github.com/skx/deployr)](https://goreportcard.com/report/github.com/skx/deployr)
+[![license](https://img.shields.io/github/license/skx/deployr.svg)](https://github.com/skx/deployr/blob/master/LICENSE)
+[![Release](https://img.shields.io/github/release/skx/deployr.svg)](https://github.com/skx/deployr/releases/latest)
+[![gocover store](http://gocover.io/_badge/github.com/skx/deployr)](http://gocover.io/github.com/skx/deployr)
+
+
 # deployr
 
 `deployr` is a simple utility which is designed to allow you to easily
