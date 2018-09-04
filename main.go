@@ -105,11 +105,11 @@ func copyFile(local string, remote string, expand bool) {
 	//
 	// If we're expanding templates then do that first of all.
 	//
-	// * Load the file.
+	// * Load the source file.
 	//
-	// * Expand the template-variables.
+	// * Perform the template-expansion of variables.
 	//
-	// * Write to a temporary file.
+	// * Write that expanded result to a temporary file.
 	//
 	// * Swap out the local-file name with the temporary-file.
 	//
@@ -120,9 +120,12 @@ func copyFile(local string, remote string, expand bool) {
 		//
 		data, err := ioutil.ReadFile(local)
 
+		//
+		// If we can't read the input-file that's a fatal error.
+		//
 		if err != nil {
 			fmt.Printf("Failed to read local file to expand template-variables %s\n", err.Error())
-			return
+			os.Exit(11)
 		}
 
 		//
@@ -172,12 +175,17 @@ func copyFile(local string, remote string, expand bool) {
 	hashLocal, err := hashFile(local)
 	if err != nil {
 		fmt.Printf("Failed to hash local file %s\n", err.Error())
+
+		//
+		// If we're trying to copy a file that doesn't exist that
+		// is a fatal error.
+		//
+		os.Exit(11)
 		return
 	}
 
 	//
-	// Now fetch the file from the remote host, if we
-	// can.
+	// Now fetch the file from the remote host, if we can.
 	//
 	tmpfile, _ := ioutil.TempFile("", "example")
 	defer os.Remove(tmpfile.Name()) // clean up
