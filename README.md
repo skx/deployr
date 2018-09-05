@@ -48,14 +48,19 @@ Each specified recipe is processed line-by-line, and the commands inside them ar
 * `DeployTo [user@]hostname[:port]`
   * Specify the details of the host to connect to.
   * If you don't specify a target within your recipe itself you can instead pass them on the command-line via the `-target` flag.
-* `IfChanged Command`
+* `IfChanged "Command"`
   * The `CopyFile` and `CopyTemplate` commands record whether they made a change to the remote system.
   * The `IfChanged` primitive will execute the specified command if the previous copy-operation resulted in the remote system being changed.
-* `Run Command`
+* `Run "Command"`
   * Run the given command (unconditionally) upon the remote-host.
-* `Set name value`
+* `Set name "value"`
   * Set the variable "name" to have the value "value".
   * Once set a variable can be used in the recipe, or as part of template-expansion.
+
+**NOTE**: Previously the "Run" and "IfChanged" primitives took bare arguments, now they __must__ be quoted.  For example:
+
+     Run "/usr/bin/id"
+     IfChanged "/usr/bin/uptime"
 
 The included [example.recipe](example.recipe) demonstrates some of these commands, and can be launched like so:
 

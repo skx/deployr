@@ -92,6 +92,20 @@ func hashFile(filePath string) (string, error) {
 	return returnSHA1String, nil
 }
 
+// TrimQuotes removes matching quotes from around a string, if present.
+//
+// For example `'steve'` becomes `steve`, but `'steve` stays unchanged,
+// as there are not matching single-quotes around the string.
+//
+func TrimQuotes(in string, c byte) string {
+	if len(in) >= 2 {
+		if in[0] == c && in[len(in)-1] == c {
+			return in[1 : len(in)-1]
+		}
+	}
+	return in
+}
+
 // copyFile is designed to copy the local file to the remote system.
 //
 // It is a little complex because it does two extra things:
@@ -467,8 +481,18 @@ func processInput(line string) {
 		}
 
 		//
+		// Alert if the argument is bare.
+		//
+		if !strings.HasPrefix(args, "\"") {
+			fmt.Printf("ERROR: The argument to 'Run' must be wrapped in quotes.\n")
+			fmt.Printf("For example:  Run \"/usr/bin/uptime\"\n")
+			os.Exit(99)
+		}
+
+		//
 		// Run runs a command.  Unconditionally
 		//
+		args = TrimQuotes(args, '"')
 		logMessage("Running command '%s'\n", args)
 		result, err := client.Exec(args)
 		if err != nil {
@@ -489,6 +513,20 @@ func processInput(line string) {
 			fmt.Printf("--target=[user@]host.example.com[:port]\n")
 			return
 		}
+
+		//
+		// Alert if the argument is bare.
+		//
+		if !strings.HasPrefix(args, "\"") {
+			fmt.Printf("ERROR: The argument to 'IfChanged' must be wrapped in quotes.\n")
+			fmt.Printf("For example:  IfChanged \"/usr/bin/uptime\"\n")
+			os.Exit(99)
+		}
+
+		//
+		// Remove the mandatory quotes
+		//
+		args = TrimQuotes(args, '"')
 
 		//
 		// IfChanged runs a command only if the
@@ -575,6 +613,20 @@ func processInput(line string) {
 
 			key := out[1]
 			val := out[2]
+
+			//
+			// Alert if the argument is bare.
+			//
+			if !strings.HasPrefix(val, "\"") {
+				fmt.Printf("ERROR: The value stored in a variable must be wrapped in quotes.\n")
+				fmt.Printf("For example:  Set name \"Steve\"\n")
+				os.Exit(99)
+			}
+
+			//
+			// Remove the quotes
+			//
+			val = TrimQuotes(val, '"')
 
 			logMessage("Set variable '%s' to '%s'\n", key, val)
 

@@ -9,7 +9,7 @@
 #
 # Set a variable
 #
-Set greeting Hello, world!
+Set greeting "Hello, world!"
 
 
 #
@@ -22,11 +22,11 @@ CopyTemplate example.recipe.template /tmp/blah
 #
 # This will show the contents of that file.
 #
-Run cat /tmp/blah
+Run "cat /tmp/blah"
 
 #
 # The following command will only be executed if the remote file is
 # updated.  So you'll see the output the first time, but not the second
 # time you run this example
 #
-IfChanged sha1sum /tmp/blah
+IfChanged "sha1sum /tmp/blah"
