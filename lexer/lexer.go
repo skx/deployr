@@ -120,7 +120,6 @@ func (l *Lexer) readString() (string, error) {
 			break
 		}
 		if l.ch == rune(0) {
-			fmt.Printf("EOF on string!\n")
 			return "", errors.New("Unterminated string!")
 		}
 
