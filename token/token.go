@@ -11,11 +11,12 @@ type Token struct {
 
 // pre-defined TokenTypes
 const (
-	EOF    = "EOF"
-	IDENT  = "IDENT"
-	STRING = "STRING"
+	EOF     = "EOF"
+	IDENT   = "IDENT"
+	ILLEGAL = "ILLEGAL"
+	STRING  = "STRING"
 
-    // Our keywords.
+	// Our keywords.
 	COPY_FILE     = "CopyFile"
 	COPY_TEMPLATE = "CopyTemplate"
 	DEPLOY_TO     = "DeployTo"

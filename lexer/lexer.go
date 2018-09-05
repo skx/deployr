@@ -1,6 +1,7 @@
 package lexer
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/skx/deployr/token"
@@ -64,8 +65,15 @@ func (l *Lexer) NextToken() token.Token {
 
 	switch l.ch {
 	case rune('"'):
-		tok.Type = token.STRING
-		tok.Literal = l.readString()
+		str, err := l.readString()
+
+		if err == nil {
+			tok.Type = token.STRING
+			tok.Literal = str
+		} else {
+			tok.Type = token.ILLEGAL
+			tok.Literal = err.Error()
+		}
 	case rune(0):
 		tok.Literal = ""
 		tok.Type = token.EOF
@@ -103,7 +111,7 @@ func (l *Lexer) skipComment() {
 }
 
 // read string
-func (l *Lexer) readString() string {
+func (l *Lexer) readString() (string, error) {
 	out := ""
 
 	for {
@@ -112,7 +120,8 @@ func (l *Lexer) readString() string {
 			break
 		}
 		if l.ch == rune(0) {
-			break
+			fmt.Printf("EOF on string!\n")
+			return "", errors.New("Unterminated string!")
 		}
 
 		//
@@ -141,7 +150,7 @@ func (l *Lexer) readString() string {
 
 	}
 
-	return out
+	return out, nil
 }
 
 // peek character

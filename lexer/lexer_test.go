@@ -33,7 +33,7 @@ func TestSomeStrings(t *testing.T) {
 
 // TestEscape ensures that strings have escape-characters processed.
 func TestStringEscape(t *testing.T) {
-	input := `"Steve\n\r\\" "Kemp\n\t\n" "Inline \"quotes\".`
+	input := `"Steve\n\r\\" "Kemp\n\t\n" "Inline \"quotes\"."`
 
 	tests := []struct {
 		expectedType    token.TokenType
@@ -118,6 +118,31 @@ Run "Steve"
 	}{
 		{token.RUN, "Run"},
 		{token.STRING, "Steve"},
+		{token.EOF, ""},
+	}
+	l := New(input)
+	for i, tt := range tests {
+		tok := l.NextToken()
+		if tok.Type != tt.expectedType {
+			t.Fatalf("tests[%d] - tokentype wrong, expected=%q, got=%q", i, tt.expectedType, tok.Type)
+		}
+		if tok.Literal != tt.expectedLiteral {
+			t.Fatalf("tests[%d] - Literal wrong, expected=%q, got=%q", i, tt.expectedLiteral, tok.Literal)
+		}
+	}
+}
+
+// TestUnterminated string ensures that an unclosed-string is an error
+func TestUnterminatedString(t *testing.T) {
+	input := `#!/usr/bin/env deployr
+Run "Steve`
+
+	tests := []struct {
+		expectedType    token.TokenType
+		expectedLiteral string
+	}{
+		{token.RUN, "Run"},
+		{token.ILLEGAL, "Unterminated string!"},
 		{token.EOF, ""},
 	}
 	l := New(input)
