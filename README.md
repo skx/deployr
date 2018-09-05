@@ -101,6 +101,19 @@ which means you can access values like so:
 In short you write `{{get "variable-name-here}}` and this will be replaced
 when the file is uploaded.
 
+### Predefined Variables
+
+The following variables are defined by default:
+
+* `host`
+  * The host being deployed to.
+* `now`
+  * An instance of the golang [time](https://golang.org/pkg/time/) object.
+* `port`
+  * The port used to connect to the remote host (22 by default).
+* `user`
+  * The username we login to the remote host as (root by default).
+
 
 Steve
 --
