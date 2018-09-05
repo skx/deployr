@@ -54,3 +54,33 @@ Oops!  The second-fetch would find `Run` instead.  The program would have to
 abort, mid-execution.
 
 > It is __horrid__ to abort a recipe half-way through, because we might set the remote host into a broken state.
+
+
+## Error Detection
+
+To catch errors in our input, before we execute it, we must consume our
+stream of tokens and parse them for sanity and correctness.
+
+The parsing process will build up a structure which we actually execute,
+and that will ensure that we don't execute programs that are invalid
+because the parsing process will catch that for us before we come to
+run them.
+
+Our parse is located beneath [parser/parser.go](parser/parser.go) and
+builds up an array of statements to execute.  Since we don't allow
+control-flow, looping, or other complex facilities we only have to parse
+statements minimally - validating the type of arguments to the various
+primitives.
+
+(i.e. We don't need to define an AST, we can continue to use the token-types
+that the lexer gave us.  I see no value in wrapping them any further, given
+that we only deal with strings, built-ins, and idents.)
+
+A statement will consist of just an action (read token) and a set of
+optional arguments:
+
+* The `Run`-command takes a single-string argument.
+   * As does `IfChanged`.
+* The `Set`-command takes a pair of arguments.
+   * An identifier and a string.
+* No command takes more than two arguments..
