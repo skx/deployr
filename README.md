@@ -6,21 +6,16 @@
 
 # deployr
 
-`deployr` is a simple utility which is designed to allow you to easily
-automate simple application-deployment via SSH.
+`deployr` is a simple utility which is designed to allow you to easily automate simple application-deployment via SSH.
 
-The core idea behind `deployr` is that installing software upon remote hosts
-frequently consists of a small number of steps:
+The core idea behind `deployr` is that installing software upon remote hosts frequently consists of a small number of steps:
 
 * Uploading a file, or small number of files.
 * Running a command, or two, to enable and start the software.
 
-This is particularly true for golang-based applications which frequently consist
-of an single binary, a single configuration file, and a systemd unit to
-ensure the service is running.
+This is particularly true for golang-based applications which frequently consist of an single binary, a single configuration file, and a systemd unit to ensure the service is running.
 
-If you want to keep your deployment recipes automatable, and reproducible,
-then scripting them with a tool like this is ideal.
+If you want to keep your deployment recipes automatable, and reproducible, then scripting them with a tool like this is ideal.  (Though you might prefer something more popular & featureful such as ansible, fabric, salt, etc.)
 
 
 ## Installation
@@ -40,135 +35,35 @@ If you don't have a golang environment setup you should be able to download a bi
 
 `deployr` is invoked by specifying the name of a file to process:
 
-
     $ deployr [options] recipe1 recipe2 .. recipeN
 
-Each recipe file is read line-by-line, and the commands inside it interpreted.
-
-The following snippet is a complete and valid example-file:
-
-     #
-     # Deploy Steve's puppet-summary application.
-     #
-     # The puppet-summary application is developed on github, and only
-     # fixed releases are installed via release-page of the project:
-     #
-     #    https://github.com/skx/puppet-summary/releases
-     #
-     # The software is deployed to the single host `master.steve.org.uk`
-     # and I connect to that host via SSH as the root-user.
-     #
-     # At the time of writing the most recent release is version 1.2
-     #
-
-
-     #
-     # Specify the host to which we're deploying.
-     #
-     # Public-key authentication is both assumed and required.
-     #
-     DeployTo root@master.steve.org.uk
-
-     #
-     # Set the release version as a variable named "RELEASE".
-     #
-     Set RELEASE 1.2
-
-     #
-     # Now that RELEASE is defined it can be used as ${RELEASE} in the rest of
-     # this file.  If you wish to use it in a file-template which is copied
-     # you can access it as "{{get RELEASE}}".
-     #
-
-     #
-     # To deploy the software I need to fetch it.  Do that with `wget`:
-     #
-     Run wget --quiet -O /srv/puppet-summary/puppet-summary-linux-amd64-${RELEASE} \
-        https://github.com/skx/puppet-summary/releases/download/release-${RELEASE}/puppet-summary-linux-amd64
-
-     #
-     # Create a symlink from this versioned download to an unqualified name.
-     #
-     Run ln -sf /srv/puppet-summary/puppet-summary-linux-amd64-${RELEASE} \
-        /srv/puppet-summary/puppet-summary
-
-
-     #
-     # Ensure the downloaded file is executable.
-     #
-     Run chmod 755 /srv/puppet-summary/puppet*
-
-     #
-     # Finally we need to make sure there is a systemd unit-file in-place which
-     # will start the service
-     #
-     CopyFile puppet-summary.service /lib/systemd/system/puppet-summary.service
-     IfChanged systemctl daemon-reload
-     IfChanged systemctl enable puppet-summary.service
-
-
-     #
-     # And now we should be able to stop/start the service
-     #
-     Run systemctl stop  puppet-summary.service
-     Run systemctl start puppet-summary.service
-
-With this example saved to `Recipe` I can now install, or update, the
-application on that host via:
-
-    $ deployr ./puppet.recipe
-
-For more verbose output the `-verbose` flag can be specified:
-
-    $ deployr -verbose ./Recipe
-
-
-
-## Command-Line Flags
-
-There are only two command-line flags supported in this initial release:
-
-* `-verbose`
-  * Operate verbosely
-* `-target`
-  * Specify the details of the system to deploy _to_.
-
-You might prefer to specify the connection-details of your target inside
-the recipe, as we did in the example we showed earlier.  If you don't
-you could write a simple file like this:
-
-    # Sample.Recipe
-    Run touch /tmp/blah
-
-Then execute it like this:
-
-    $ deployr -target username@host.example.com ./Sample.Recipe
-
-
-## Supported Features
-
-The previous example showed a good overview of the facilities available.
-
-The list of supported-primitives is:
+Each specified recipe is processed line-by-line, and the commands inside them are interpreted.  The full list of supported commands is:
 
 * `CopyFile local/path remote/path`
   * Copy the specified local file to the specified path on the remote system.
-  * If the local & remote files differ then this will be recorded.
+  * If the local & remote files were already identical, such that no change was made, then this will be noted.
 * `CopyTemplate local/path remote/path`
   * Copy the specified local file to the specified path on the remote system, expanding variables prior to running the copy.
-  * If the local & remote files differ then this will be recorded.
+  * If the local & remote files were already identical, such that no change was made, then this will be noted.
 * `DeployTo [user@]hostname[:port]`
   * Specify the details of the host to connect to.
-  * If you don't specify a target within your recipe itself you can instead pass them on the command-line via `-target [user@]hostname.example.com[:port]`.
-* `IfChanged`
-  * The `CopyFile`, & `CopyTemplate` primitive record whether they made a change to the remote system.
-  * The `IfChanged` primitive will only execute the given command if the previous copy-operation resulted in the remote system being changed.
+  * If you don't specify a target within your recipe itself you can instead pass them on the command-line via the `-target` flag.
+* `IfChanged Command`
+  * The `CopyFile` and `CopyTemplate` commands record whether they made a change to the remote system.
+  * The `IfChanged` primitive will execute the specified command if the previous copy-operation resulted in the remote system being changed.
 * `Run Command`
   * Run the given command (unconditionally) upon the remote-host.
 * `Set name value`
   * Set the variable "name" to have the value "value".
   * Once set a variable can be used in the recipe, or as part of template-expansion.
 
+The included [example.recipe](example.recipe) demonstrates some of these commands, and can be launched like so:
+
+    $ deployr -target [user@]host.example.com[:port] ./example.recipe
+
+For more verbose output the `-verbose` flag can be added too:
+
+    $ deployr -target [user@]host.example.com[:port] -verbose ./example.recipe
 
 
 ## Template Expansion
@@ -176,15 +71,13 @@ The list of supported-primitives is:
 In addition to copying files literally from the local system to the remote
 host it is also possible perform some limited template-expansion.
 
-In the previous example we saw that a variable was defined, and then used,
-like so:
+We could declare a variable `RELEASE` to contain the version-number of a release we're pulling from a remote-host for example:
 
     Set RELEASE 1.2
-    Run wget ... ${RELEASE}
+    Run wget -O /usr/local/bin/app-${RELESAE} https://example.com/dist/app-${RELEASE}
 
-Any variable which is set like this, (via `Set`), along with basic details
-of the host being deployed to can be inserted into template-files which
-are copied from the local-host to the remote system.
+Any variable which is set like this, along with basic details of the host being
+deployed to can be inserted into template-files which are copied from the local-host to the remote system.
 
 To copy a file literally you'd write:
 
@@ -209,6 +102,5 @@ In short you write `{{get "variable-name-here}}` and this will be replaced
 when the file is uploaded.
 
 
-## COmm
 Steve
 --
