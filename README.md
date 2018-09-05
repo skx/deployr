@@ -78,8 +78,8 @@ host it is also possible perform some limited template-expansion.
 
 We could declare a variable `RELEASE` to contain the version-number of a release we're pulling from a remote-host for example:
 
-    Set RELEASE 1.2
-    Run wget -O /usr/local/bin/app-${RELESAE} https://example.com/dist/app-${RELEASE}
+    Set RELEASE "1.2"
+    Run "wget -O /usr/local/bin/app-${RELESAE} https://example.com/dist/app-${RELEASE}"
 
 Any variable which is set like this, along with basic details of the host being
 deployed to can be inserted into template-files which are copied from the local-host to the remote system.
