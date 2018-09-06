@@ -14,6 +14,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"regexp"
 	"strings"
 	"text/template"
 	"time"
@@ -153,8 +154,8 @@ func (e *Evaluator) Run() error {
 			//
 			// Get the arguments and run the copy.
 			//
-			src := statement.Arguments[0].Literal
-			dst := statement.Arguments[1].Literal
+			src := e.expandString(statement.Arguments[0].Literal)
+			dst := e.expandString(statement.Arguments[1].Literal)
 			e.copyFile(src, dst, true)
 			break
 
@@ -170,8 +171,8 @@ func (e *Evaluator) Run() error {
 			//
 			// Get the arguments and run the copy.
 			//
-			src := statement.Arguments[0].Literal
-			dst := statement.Arguments[1].Literal
+			src := e.expandString(statement.Arguments[0].Literal)
+			dst := e.expandString(statement.Arguments[1].Literal)
 			e.copyFile(src, dst, false)
 			break
 
@@ -180,7 +181,8 @@ func (e *Evaluator) Run() error {
 			//
 			// Get the arguments, and connect.
 			//
-			err := e.ConnectTo(statement.Arguments[0].Literal)
+			arg := e.expandString(statement.Arguments[0].Literal)
+			err := e.ConnectTo(arg)
 			if err != nil {
 				return err
 			}
@@ -207,7 +209,7 @@ func (e *Evaluator) Run() error {
 			//
 			// Get the command to execute.
 			//
-			cmd := statement.Arguments[0].Literal
+			cmd := e.expandString(statement.Arguments[0].Literal)
 			result, err := e.Connection.Exec(cmd)
 			if err != nil {
 				return (fmt.Errorf("Failed to run command '%s': %s\n", cmd, err.Error()))
@@ -228,7 +230,7 @@ func (e *Evaluator) Run() error {
 				return fmt.Errorf("Tried to run a command, but not connected to a target!")
 			}
 
-			cmd := statement.Arguments[0].Literal
+			cmd := e.expandString(statement.Arguments[0].Literal)
 			result, err := e.Connection.Exec(cmd)
 			if err != nil {
 				return (fmt.Errorf("Failed to run command '%s': %s\n", cmd, err.Error()))
@@ -247,7 +249,7 @@ func (e *Evaluator) Run() error {
 			// Get the arguments and set the variable.
 			//
 			key := statement.Arguments[0].Literal
-			val := statement.Arguments[1].Literal
+			val := e.expandString(statement.Arguments[1].Literal)
 			e.Variables[key] = val
 
 			break
@@ -466,4 +468,27 @@ func (e *Evaluator) copyFile(local string, remote string, expand bool) {
 	if expand {
 		os.Remove(local)
 	}
+}
+
+// expandString expands tokens of the form "${blah}" into the
+// value of the variable "blah".
+func (e *Evaluator) expandString(in string) string {
+
+	//
+	// Expand any variables which have previously been
+	// declared.
+	//
+	re := regexp.MustCompile("\\$\\{([^\\}]+)\\}")
+	in = re.ReplaceAllStringFunc(in, func(in string) string {
+
+		in = strings.TrimPrefix(in, "${")
+		in = strings.TrimSuffix(in, "}")
+
+		if len(e.Variables[in]) > 0 {
+			return (e.Variables[in])
+		}
+		return "${" + in + "}"
+	})
+
+	return in
 }
