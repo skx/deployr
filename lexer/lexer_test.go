@@ -183,3 +183,20 @@ which continues"
 		}
 	}
 }
+
+// TestDump just calls dump on some tokens.
+func TestDump(t *testing.T) {
+	input := `#!/usr/bin/env deployr
+# This is another comment`
+
+	l := New(input)
+	l.Dump()
+
+	//
+	// Since we've consumed all the input we expect we'll
+	// read past the input here.
+	//
+	if l.peekChar() != rune(0) {
+		t.Fatalf("We still have input, after dumping our stream")
+	}
+}
