@@ -8,20 +8,36 @@ package parser
 import (
 	"fmt"
 
-	"github.com/skx/deployr/lexer"
 	"github.com/skx/deployr/statement"
+	"github.com/skx/deployr/token"
 )
+
+//
+// We expect to consume tokens from our Lexer, but we use a layer
+// of indirection by constructing our parser with an interface
+// instead.
+//
+// This allows us to create a `FakeLexer` which satisfies the
+// interface for testing-purposes.
+//
+type tokenizer interface {
+
+	// Our tokenizer interface requires anything we
+	// use to implement the NextToken() method - which
+	// should return the next token in the stream.
+	NextToken() token.Token
+}
 
 // Parser holds our internal state.
 type Parser struct {
-	// Lexer is our lexer.
-	Lexer *lexer.Lexer
+	// Our tokenizer.
+	Tokenizer tokenizer
 }
 
 // New returns a new Parser object, consuming tokens from the specified
-// lexer.
-func New(lexer *lexer.Lexer) *Parser {
-	l := &Parser{Lexer: lexer}
+// tokenizer-interface.
+func New(tk tokenizer) *Parser {
+	l := &Parser{Tokenizer: tk}
 	return l
 }
 
@@ -39,7 +55,7 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 		//
 		// Get the next token.
 		//
-		tok := p.Lexer.NextToken()
+		tok := p.Tokenizer.NextToken()
 
 		//
 		// Process each token-type appropriately.
@@ -57,7 +73,7 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 			// That might be a bogus number (if we supported numbers),
 			// or an unterminated string.
 			//
-			return result, fmt.Errorf("Error retrieceved from the lexer - %s\n", tok.Literal)
+			return result, fmt.Errorf("Error received from the lexer - %s\n", tok.Literal)
 		case "STRING":
 			//
 			// If we find a bare-string which is not an argument
@@ -79,12 +95,12 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 			//
 			// (Here IDENT means "path".)
 			//
-			str1 := p.Lexer.NextToken()
+			str1 := p.Tokenizer.NextToken()
 			if str1.Type != "IDENT" {
 				return nil, fmt.Errorf("Expected IDENT as first argument to 'CopyTemplate' - Got %v", str1)
 			}
 
-			str2 := p.Lexer.NextToken()
+			str2 := p.Tokenizer.NextToken()
 			if str2.Type != "IDENT" {
 				return nil, fmt.Errorf("Expected IDENT as second argument to 'CopyTemplate' - Got %v", str2)
 			}
@@ -108,12 +124,12 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 			//
 			// (Here IDENT means "path".)
 			//
-			str1 := p.Lexer.NextToken()
+			str1 := p.Tokenizer.NextToken()
 			if str1.Type != "IDENT" {
 				return nil, fmt.Errorf("Expected IDENT as first argument to 'CopyFile' - Got %v", str1)
 			}
 
-			str2 := p.Lexer.NextToken()
+			str2 := p.Tokenizer.NextToken()
 			if str2.Type != "IDENT" {
 				return nil, fmt.Errorf("Expected IDENT as second argument to 'CopyFile' - Got %v", str2)
 			}
@@ -133,7 +149,7 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 			//
 			//  1. IDENT
 			//
-			str := p.Lexer.NextToken()
+			str := p.Tokenizer.NextToken()
 			if str.Type != "IDENT" {
 				return nil, fmt.Errorf("Expected IDENT as first argument to 'DeployTo' - Got %v", str)
 			}
@@ -153,7 +169,7 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 			//
 			//  1. String
 			//
-			str := p.Lexer.NextToken()
+			str := p.Tokenizer.NextToken()
 			if str.Type != "STRING" {
 				return nil, fmt.Errorf("Expected STRING as first argument to 'IfChanged' - Got %v", str)
 			}
@@ -173,7 +189,7 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 			//
 			//  1. String
 			//
-			str := p.Lexer.NextToken()
+			str := p.Tokenizer.NextToken()
 			if str.Type != "STRING" {
 				return nil, fmt.Errorf("Expected STRING as first argument to 'Run' - Got %v", str)
 			}
@@ -194,11 +210,11 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 			//  1. Ident.
 			//  2. String
 			//
-			id := p.Lexer.NextToken()
+			id := p.Tokenizer.NextToken()
 			if id.Type != "IDENT" {
 				return nil, fmt.Errorf("Expected IDENT as first argument to Set - Got %v", id)
 			}
-			str := p.Lexer.NextToken()
+			str := p.Tokenizer.NextToken()
 			if str.Type != "STRING" {
 				return nil, fmt.Errorf("Expected STRING as second argument to Set - Got %v", str)
 			}
