@@ -22,6 +22,7 @@ func main() {
 	subcommands.Register(subcommands.CommandsCommand(), "")
 	subcommands.Register(&lexCmd{}, "")
 	subcommands.Register(&parseCmd{}, "")
+	subcommands.Register(&runCmd{}, "")
 
 	flag.Parse()
 	ctx := context.Background()
