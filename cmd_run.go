@@ -9,12 +9,12 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
-	"os"
 
 	"github.com/google/subcommands"
 	"github.com/skx/deployr/evaluator"
 	"github.com/skx/deployr/lexer"
 	"github.com/skx/deployr/parser"
+	"github.com/skx/deployr/util"
 )
 
 //
@@ -45,6 +45,76 @@ func (r *runCmd) SetFlags(f *flag.FlagSet) {
 }
 
 //
+// Run the given recipe
+//
+func (r *runCmd) Run(file string) {
+
+	//
+	// Read the contents of the file.
+	//
+	dat, err := ioutil.ReadFile(file)
+	if err != nil {
+		fmt.Printf("Error reading file %s - %s\n", file, err.Error())
+		return
+	}
+
+	//
+	// Create a lexer object with those contents.
+	//
+	l := lexer.New(string(dat))
+
+	//
+	// Create a parser, using the lexer.
+	//
+	p := parser.New(l)
+
+	//
+	// Parse the program, looking for errors.
+	//
+	statements, err := p.Parse()
+	if err != nil {
+		fmt.Printf("Error parsing program: %s\n", err.Error())
+		return
+	}
+
+	//
+	// No errors?  Great.
+	//
+	// Create the evaluator - which will run the statements.
+	//
+	e := evaluator.New(statements)
+
+	//
+	// Set the target, if we've been given one.
+	//
+	if r.target != "" {
+		err := e.ConnectTo(r.target)
+		if err != nil {
+			fmt.Printf("Failed to connect to target: %s\n", err.Error())
+			return
+
+		}
+	}
+
+	//
+	// Set the verbosity-level
+	//
+	e.SetVerbose(r.verbose)
+
+	//
+	// Now run the program.  Hurrah!
+	//
+	err = e.Run()
+
+	//
+	// Errors?  Boo!
+	//
+	if err != nil {
+		fmt.Printf("Error running program\n%s\n", err.Error())
+	}
+}
+
+//
 // Entry-point.
 //
 func (r *runCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
@@ -53,69 +123,15 @@ func (r *runCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) s
 	// For each file we were given.
 	//
 	for _, file := range f.Args() {
+		r.Run(file)
+	}
 
-		//
-		// Read the contents of the file.
-		//
-		dat, err := ioutil.ReadFile(file)
-		if err != nil {
-			fmt.Printf("Error reading file %s - %s\n", file, err.Error())
-			os.Exit(1)
-		}
-
-		//
-		// Create a lexer object with those contents.
-		//
-		l := lexer.New(string(dat))
-
-		//
-		// Create a parser, using the lexer.
-		//
-		p := parser.New(l)
-
-		//
-		// Parse the program, looking for errors.
-		//
-		statements, err := p.Parse()
-		if err != nil {
-			fmt.Printf("Error parsing program: %s\n", err.Error())
-			return subcommands.ExitFailure
-		}
-
-		//
-		// No errors?  Great.
-		//
-		// Create the evaluator - which will run the statements.
-		//
-		e := evaluator.New(statements)
-
-		//
-		// Set the target, if we've been given one.
-		//
-		if r.target != "" {
-			err := e.ConnectTo(r.target)
-			if err != nil {
-				fmt.Printf("Failed to connect to target: %s\n", err.Error())
-				return subcommands.ExitFailure
-
-			}
-		}
-
-		//
-		// Set the verbosity-level
-		//
-		e.SetVerbose(r.verbose)
-
-		//
-		// Now run the program.  Hurrah!
-		//
-		err = e.Run()
-
-		//
-		// Errors?  Boo!
-		//
-		if err != nil {
-			fmt.Printf("Error running program\n%s\n", err.Error())
+	//
+	// Fallback.
+	//
+	if len(f.Args()) < 1 {
+		if util.FileExists("deploy.recipe") {
+			r.Run("deploy.recipe")
 		}
 	}
 

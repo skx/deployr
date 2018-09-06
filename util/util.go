@@ -7,9 +7,17 @@ import (
 	"os"
 )
 
-//
-// hashFile returns the SHA1-hash of the contents of the specified file.
-//
+// FileExists reports whether the named file or directory exists.
+func FileExists(name string) bool {
+	if _, err := os.Stat(name); err != nil {
+		if os.IsNotExist(err) {
+			return false
+		}
+	}
+	return true
+}
+
+// HashFile returns the SHA1-hash of the contents of the specified file.
 func HashFile(filePath string) (string, error) {
 	var returnSHA1String string
 

@@ -9,10 +9,10 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
-	"os"
 
 	"github.com/google/subcommands"
 	"github.com/skx/deployr/lexer"
+	"github.com/skx/deployr/util"
 )
 
 //
@@ -39,6 +39,31 @@ func (p *lexCmd) SetFlags(f *flag.FlagSet) {
 }
 
 //
+// Lex the given recipe
+//
+func (p *lexCmd) Lex(file string) {
+
+	//
+	// Read the file contents.
+	//
+	dat, err := ioutil.ReadFile(file)
+	if err != nil {
+		fmt.Printf("Error reading file %s - %s\n", file, err.Error())
+		return
+	}
+
+	//
+	// Create a lexer object with those contents.
+	//
+	l := lexer.New(string(dat))
+
+	//
+	// Dump the tokens.
+	//
+	l.Dump()
+}
+
+//
 // Entry-point.
 //
 func (p *lexCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
@@ -47,25 +72,16 @@ func (p *lexCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) s
 	// For each file we've been passed.
 	//
 	for _, file := range f.Args() {
+		p.Lex(file)
+	}
 
-		//
-		// Read the file contents.
-		//
-		dat, err := ioutil.ReadFile(file)
-		if err != nil {
-			fmt.Printf("Error reading file %s - %s\n", file, err.Error())
-			os.Exit(1)
+	//
+	// Fallback.
+	//
+	if len(f.Args()) < 1 {
+		if util.FileExists("deploy.recipe") {
+			p.Lex("deploy.recipe")
 		}
-
-		//
-		// Create a lexer object with those contents.
-		//
-		l := lexer.New(string(dat))
-
-		//
-		// Dump the tokens.
-		//
-		l.Dump()
 	}
 
 	return subcommands.ExitSuccess

@@ -70,3 +70,31 @@ func TestHashMissing(t *testing.T) {
 		t.Errorf("We expected an error, but received none.\n")
 	}
 }
+
+// TestFileExists tests our file-testing function.
+func TestFileExists(t *testing.T) {
+
+	//
+	// Generate a temporary file
+	//
+	tmpfile, err := ioutil.TempFile("", "example")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	//
+	// Ensure it exists.
+	//
+	if !FileExists(tmpfile.Name()) {
+		t.Errorf("Testing a present-file failed")
+	}
+
+	//
+	// Now remove it and test it is gone.
+	//
+	os.Remove(tmpfile.Name())
+
+	if FileExists(tmpfile.Name()) {
+		t.Errorf("Missing file is still present?")
+	}
+}
