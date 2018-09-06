@@ -33,21 +33,24 @@ If you don't have a golang environment setup you should be able to download a bi
 
 ## Overview
 
-`deployr` is invoked by specifying the name of a file to process:
+`deployr` has various sub-commands, the most useful is the `run` command which
+allows you to execute a recipe-file:
 
-    $ deployr [options] recipe1 recipe2 .. recipeN
+    $ deployr run [options] recipe1 recipe2 .. recipeN
 
-Each specified recipe is processed line-by-line, and the commands inside them are interpreted.  The full list of supported commands is:
+Each specified recipe is processed line-by-line, and the commands inside them are interpreted.
+
+The following primitives/commands are available:
 
 * `CopyFile local/path remote/path`
   * Copy the specified local file to the specified path on the remote system.
-  * If the local & remote files were already identical, such that no change was made, then this will be noted.
+  * If the local & remote files were identical, such that no change was made, then this will be noted.
 * `CopyTemplate local/path remote/path`
   * Copy the specified local file to the specified path on the remote system, expanding variables prior to running the copy.
-  * If the local & remote files were already identical, such that no change was made, then this will be noted.
+  * If the local & remote files were identical, such that no change was made, then this will be noted.
 * `DeployTo [user@]hostname[:port]`
-  * Specify the details of the host to connect to.
-  * If you don't specify a target within your recipe itself you can instead pass them on the command-line via the `-target` flag.
+  * Specify the details of the host to connect to, this is useful if a particular recipe should only be applied against a single host.
+  * If you don't specify a target within your recipe itself you can instead pass it upon the command-line via the `-target` flag.
 * `IfChanged "Command"`
   * The `CopyFile` and `CopyTemplate` commands record whether they made a change to the remote system.
   * The `IfChanged` primitive will execute the specified command if the previous copy-operation resulted in the remote system being changed.
@@ -64,11 +67,11 @@ Each specified recipe is processed line-by-line, and the commands inside them ar
 
 The included [example.recipe](example.recipe) demonstrates some of these commands, and can be launched like so:
 
-    $ deployr -target [user@]host.example.com[:port] ./example.recipe
+    $ deployr run -target [user@]host.example.com[:port] ./example.recipe
 
-For more verbose output the `-verbose` flag can be added too:
+For more verbose output the `-verbose` flag may be added:
 
-    $ deployr -target [user@]host.example.com[:port] -verbose ./example.recipe
+    $ deployr run -target [user@]host.example.com[:port] -verbose ./example.recipe
 
 
 ## Template Expansion
@@ -106,6 +109,7 @@ which means you can access values like so:
 In short you write `{{get "variable-name-here}}` and this will be replaced
 when the file is uploaded.
 
+
 ### Predefined Variables
 
 The following variables are defined by default:
@@ -118,6 +122,12 @@ The following variables are defined by default:
   * The port used to connect to the remote host (22 by default).
 * `user`
   * The username we login to the remote host as (root by default).
+
+
+## Missing Primitives?
+
+If there are primitives you think would be useful to add then please do
+[file a bug](http://github.com/skx/deployr/issues).
 
 
 Steve
