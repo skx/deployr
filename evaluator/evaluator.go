@@ -280,7 +280,6 @@ func (e *Evaluator) Run() error {
 
 		default:
 			return fmt.Errorf("Unhandled statement - %v\n", statement.Token)
-			break
 		}
 	}
 
