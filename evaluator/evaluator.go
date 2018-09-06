@@ -8,10 +8,7 @@ package evaluator
 
 import (
 	"bytes"
-	"crypto/sha1"
-	"encoding/hex"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"regexp"
@@ -21,6 +18,7 @@ import (
 
 	"github.com/sfreiberg/simplessh"
 	"github.com/skx/deployr/statement"
+	"github.com/skx/deployr/util"
 )
 
 // Evaluator holds our internal state.
@@ -299,31 +297,6 @@ func (e *Evaluator) Run() error {
 	return nil
 }
 
-//
-// hashFile returns the SHA1-hash of the contents of the specified file.
-//
-func (e *Evaluator) hashFile(filePath string) (string, error) {
-	var returnSHA1String string
-
-	file, err := os.Open(filePath)
-	if err != nil {
-		return returnSHA1String, err
-	}
-
-	defer file.Close()
-
-	hash := sha1.New()
-
-	if _, err := io.Copy(hash, file); err != nil {
-		return returnSHA1String, err
-	}
-
-	hashInBytes := hash.Sum(nil)[:20]
-	returnSHA1String = hex.EncodeToString(hashInBytes)
-
-	return returnSHA1String, nil
-}
-
 // copyFile is designed to copy the local file to the remote system.
 //
 // It is a little complex because it does two extra things:
@@ -404,7 +377,7 @@ func (e *Evaluator) copyFile(local string, remote string, expand bool) {
 	//
 	// NOTE: We do this after we've expanded any variables.
 	//
-	hashLocal, err := e.hashFile(local)
+	hashLocal, err := util.HashFile(local)
 	if err != nil {
 		fmt.Printf("Failed to hash local file %s\n", err.Error())
 
@@ -429,7 +402,7 @@ func (e *Evaluator) copyFile(local string, remote string, expand bool) {
 		// We had no error - so we now have the
 		// remote file copied here.
 		//
-		hashRemote, err := e.hashFile(tmpfile.Name())
+		hashRemote, err := util.HashFile(tmpfile.Name())
 		if err != nil {
 			fmt.Printf("Failed to hash remote file %s\n", err.Error())
 
