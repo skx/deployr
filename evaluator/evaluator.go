@@ -73,10 +73,6 @@ func (e *Evaluator) ConnectTo(target string) error {
 		return nil
 	}
 
-	if e.Verbose {
-		fmt.Printf("Connecting to %s\n", target)
-	}
-
 	//
 	// Default username + port
 	//
@@ -156,6 +152,10 @@ func (e *Evaluator) Run() error {
 			//
 			src := e.expandString(statement.Arguments[0].Literal)
 			dst := e.expandString(statement.Arguments[1].Literal)
+			if e.Verbose {
+				fmt.Printf("CopyTemplate(\"%s\", \"%s\")\n", src, dst)
+			}
+
 			e.copyFile(src, dst, true)
 			break
 
@@ -173,6 +173,11 @@ func (e *Evaluator) Run() error {
 			//
 			src := e.expandString(statement.Arguments[0].Literal)
 			dst := e.expandString(statement.Arguments[1].Literal)
+
+			if e.Verbose {
+				fmt.Printf("CopyFile(\"%s\", \"%s\")\n", src, dst)
+			}
+
 			e.copyFile(src, dst, false)
 			break
 
@@ -182,6 +187,11 @@ func (e *Evaluator) Run() error {
 			// Get the arguments, and connect.
 			//
 			arg := e.expandString(statement.Arguments[0].Literal)
+
+			if e.Verbose {
+				fmt.Printf("DeployTo(\"%s\")\n", arg)
+			}
+
 			err := e.ConnectTo(arg)
 			if err != nil {
 				return err
@@ -210,6 +220,11 @@ func (e *Evaluator) Run() error {
 			// Get the command to execute.
 			//
 			cmd := e.expandString(statement.Arguments[0].Literal)
+
+			if e.Verbose {
+				fmt.Printf("IfChanged(\"%s\")\n", cmd)
+			}
+
 			result, err := e.Connection.Exec(cmd)
 			if err != nil {
 				return (fmt.Errorf("Failed to run command '%s': %s\n", cmd, err.Error()))
@@ -231,6 +246,11 @@ func (e *Evaluator) Run() error {
 			}
 
 			cmd := e.expandString(statement.Arguments[0].Literal)
+
+			if e.Verbose {
+				fmt.Printf("Run(\"%s\")\n", cmd)
+			}
+
 			result, err := e.Connection.Exec(cmd)
 			if err != nil {
 				return (fmt.Errorf("Failed to run command '%s': %s\n", cmd, err.Error()))
@@ -250,6 +270,10 @@ func (e *Evaluator) Run() error {
 			//
 			key := statement.Arguments[0].Literal
 			val := e.expandString(statement.Arguments[1].Literal)
+
+			if e.Verbose {
+				fmt.Printf("Set(\"%s\", \"%s\")\n", key, val)
+			}
 			e.Variables[key] = val
 
 			break
