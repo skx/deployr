@@ -127,6 +127,14 @@ func (l *Lexer) readString() (string, error) {
 		// Handle \n, \r, \t, \", etc.
 		//
 		if l.ch == '\\' {
+
+			// Line ending with "\" + newline
+			if l.peekChar() == '\n' {
+				// consume the newline.
+				l.readChar()
+				continue
+			}
+
 			l.readChar()
 
 			if l.ch == rune('n') {
