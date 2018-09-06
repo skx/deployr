@@ -8,19 +8,25 @@
 
 `deployr` is a simple utility which is designed to allow you to easily automate simple application-deployment via SSH.
 
-The core idea behind `deployr` is that installing software upon remote hosts frequently consists of a small number of steps:
+The core idea behind `deployr` is that installing (simple) software upon remote hosts frequently consists of a small number of steps:
 
-* Uploading a file, or small number of files.
-* Running a command, or two, to enable and start the software.
+* Uploading a small number of files, for example:
+  * A binary application.
+  * A configuration-file.
+  * A systemd unit-file
+  * etc.
+* Running a small number of commands, some conditionally, for example:
+  * Enable the systemd unit-file.
+  * Start the service.
 
-This is particularly true for golang-based applications which frequently consist of an single binary, a single configuration file, and a systemd unit to ensure the service is running.
+This is particularly true for golang-based applications which frequently consist of an single binary, a single configuration file, and an init-file to ensure the service can be controlled.
 
-If you want to keep your deployment recipes automatable, and reproducible, then scripting them with a tool like this is ideal.  (Though you might prefer something more popular & featureful such as ansible, fabric, salt, etc.)
+If you want to keep your deployment recipes automatable, and reproducible, then scripting them with a tool like this is ideal.  (Though you might prefer something more popular & featureful such as `ansible`, `fabric`, `salt`, etc.)
 
 
 ## Installation
 
-Providing you have a working go-installation you should be able to install this software by running:
+Providing you have a working go-installation you should be able to install this tool by running:
 
     go get -u  github.com/skx/deployr
     go install github.com/skx/deployr
@@ -33,23 +39,24 @@ If you don't have a golang environment setup you should be able to download a bi
 
 ## Overview
 
-`deployr` is invoked by specifying the name of a file to process:
+`deployr` has various sub-commands, the most useful is the `run` command which
+allows you to execute a recipe-file:
 
-    $ deployr [options] recipe1 recipe2 .. recipeN
+    $ deployr run [options] recipe1 recipe2 .. recipeN
 
-Each specified recipe is processed line-by-line, and the commands inside them are interpreted.  The full list of supported commands is:
+Each specified recipe is parsed and the primitives inside them are then executed line by line.  The following primitives/commands are available:
 
 * `CopyFile local/path remote/path`
   * Copy the specified local file to the specified path on the remote system.
-  * If the local & remote files were already identical, such that no change was made, then this will be noted.
+  * If the local & remote files were identical, such that no change was made, then this fact will be noted.
 * `CopyTemplate local/path remote/path`
   * Copy the specified local file to the specified path on the remote system, expanding variables prior to running the copy.
-  * If the local & remote files were already identical, such that no change was made, then this will be noted.
+  * If the local & remote files were identical, such that no change was made, then this fact will be noted.
 * `DeployTo [user@]hostname[:port]`
-  * Specify the details of the host to connect to.
-  * If you don't specify a target within your recipe itself you can instead pass them on the command-line via the `-target` flag.
+  * Specify the details of the host to connect to, this is useful if a particular recipe should only be applied against a single host.
+  * If you don't specify a target within your recipe itself you can instead pass it upon the command-line via the `-target` flag.
 * `IfChanged "Command"`
-  * The `CopyFile` and `CopyTemplate` commands record whether they made a change to the remote system.
+  * The `CopyFile` and `CopyTemplate` primitives record whether they made a change to the remote system.
   * The `IfChanged` primitive will execute the specified command if the previous copy-operation resulted in the remote system being changed.
 * `Run "Command"`
   * Run the given command (unconditionally) upon the remote-host.
@@ -64,47 +71,30 @@ Each specified recipe is processed line-by-line, and the commands inside them ar
 
 The included [example.recipe](example.recipe) demonstrates some of these commands, and can be launched like so:
 
-    $ deployr -target [user@]host.example.com[:port] ./example.recipe
+    $ deployr run -target [user@]host.example.com[:port] ./example.recipe
 
-For more verbose output the `-verbose` flag can be added too:
+For more verbose output the `-verbose` flag may be added:
 
-    $ deployr -target [user@]host.example.com[:port] -verbose ./example.recipe
+    $ deployr run -target [user@]host.example.com[:port] -verbose ./example.recipe
 
 
-## Template Expansion
 
-In addition to copying files literally from the local system to the remote
-host it is also possible perform some limited template-expansion.
+## Variables
 
-We could declare a variable `RELEASE` to contain the version-number of a release we're pulling from a remote-host for example:
+It is often useful to allow values to be stored in variables, for example if you're used to pulling a file from a remote host you might make the version of that release a variable.
+
+Variables are defined with the `Set` primitive, which takes two arguments:
+
+* The name of the variable.
+* The value to set for that variable.
+  * Values will be set as strings, in fact our mini-language only understands strings.
+
+In the following example we declare the variable called "RELEASE" to have the value "1.2", and then use it in a command-execution:
 
     Set RELEASE "1.2"
-    Run "wget -O /usr/local/bin/app-${RELESAE} https://example.com/dist/app-${RELEASE}"
+    Run "wget -O /usr/local/bin/app-${RELEASE} \
+           https://example.com/dist/app-${RELEASE}"
 
-Any variable which is set like this, along with basic details of the host being
-deployed to can be inserted into template-files which are copied from the local-host to the remote system.
-
-To copy a file literally you'd write:
-
-    CopyFile local.txt /tmp/remote.txt
-
-To copy a file with template-expansion performed upon its contents you'd write:
-
-    CopyTemplate local.txt /tmp/remote.txt
-
-The file being copied will be processed with the `text/template` library
-which means you can access values like so:
-
-    #
-    # This is a configuration file blah.conf
-    # We can expand variables like so:
-    #
-    # Deployed version {{get "RELEASE"}} on Host:{{get "host"}}:{{get "port"}}
-    # at {{now.UTC.Day}} {{now.UTC.Month}} {{now.UTC.Year}}
-    #
-
-In short you write `{{get "variable-name-here}}` and this will be replaced
-when the file is uploaded.
 
 ### Predefined Variables
 
@@ -118,6 +108,44 @@ The following variables are defined by default:
   * The port used to connect to the remote host (22 by default).
 * `user`
   * The username we login to the remote host as (root by default).
+
+
+
+
+## Template Expansion
+
+In addition to copying files literally from the local system to the remote
+host it is also possible perform some limited template-expansion.
+
+To copy a file literally you'd use the `CopyFile` primitive:
+
+    CopyFile local.txt /tmp/remote.txt
+
+To copy a file with template-expansion performed upon its contents you use the `CopyTemplate` primitive instead:
+
+    CopyTemplate local.txt /tmp/remote.txt
+
+The file being copied will then be processed with the `text/template` library
+which means you can access values like so:
+
+    #
+    # This is a configuration file blah.conf
+    # We can expand variables like so:
+    #
+    # Deployed version {{get "RELEASE"}} on Host:{{get "host"}}:{{get "port"}}
+    # at {{now.UTC.Day}} {{now.UTC.Month}} {{now.UTC.Year}}
+    #
+
+In short you write `{{get "variable-name-here}}` and the value of the variable
+will be output inline.
+
+
+
+
+## Missing Primitives?
+
+If there are primitives you think would be useful to add then please do
+[file a bug](http://github.com/skx/deployr/issues).
 
 
 Steve
