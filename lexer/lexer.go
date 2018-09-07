@@ -164,9 +164,8 @@ func (l *Lexer) readString() (string, error) {
 func (l *Lexer) peekChar() rune {
 	if l.readPosition >= len(l.characters) {
 		return rune(0)
-	} else {
-		return l.characters[l.readPosition]
 	}
+	return l.characters[l.readPosition]
 }
 
 // determinate ch is identifier or not
