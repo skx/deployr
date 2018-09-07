@@ -15,7 +15,11 @@ import (
 	"github.com/skx/deployr/token"
 )
 
+// Statement holds a single statement to be executed.
 type Statement struct {
-	Token     token.Token
+	// Token is the main action "Set", "Run", etc.
+	Token token.Token
+
+	// Arguments contains the arguments to the operation.
 	Arguments []token.Token
 }

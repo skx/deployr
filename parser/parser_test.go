@@ -75,14 +75,14 @@ func TestEOF(t *testing.T) {
 //
 // "STRING" is valid, "IDENT" is bogus.
 //
-func testSingleArgument(t *testing.T, token_name token.TokenType, valid_type token.TokenType, bogus_type token.TokenType) {
+func testSingleArgument(t *testing.T, tokenName token.TokenType, validType token.TokenType, bogusType token.TokenType) {
 
 	//
 	// The fake-program which should be valid
 	//
 	valid := []token.Token{
-		{Type: token_name, Literal: string(token_name)},
-		{Type: valid_type, Literal: "My argument here"},
+		{Type: tokenName, Literal: string(tokenName)},
+		{Type: validType, Literal: "My argument here"},
 		{Type: "EOF", Literal: "EOF"},
 	}
 
@@ -90,8 +90,8 @@ func testSingleArgument(t *testing.T, token_name token.TokenType, valid_type tok
 	// The fake-program which should be invalid
 	//
 	invalid := []token.Token{
-		{Type: token_name, Literal: string(token_name)},
-		{Type: bogus_type, Literal: "My argument here"},
+		{Type: tokenName, Literal: string(tokenName)},
+		{Type: bogusType, Literal: "My argument here"},
 		{Type: "EOF", Literal: "EOF"},
 	}
 
@@ -108,7 +108,7 @@ func testSingleArgument(t *testing.T, token_name token.TokenType, valid_type tok
 	//
 	// We expect our statement to be "DeployTo" with the argument
 	// pointing to example.com
-	if program[0].Token.Type != token_name {
+	if program[0].Token.Type != tokenName {
 		t.Fatalf("Unexpected statement-type : %s\n", program[0].Token.Type)
 	}
 	if len(program[0].Arguments) != 1 {
@@ -127,7 +127,7 @@ func testSingleArgument(t *testing.T, token_name token.TokenType, valid_type tok
 	if err == nil {
 		t.Fatalf("Expected to receive an error got none\n")
 	}
-	if !strings.Contains(err.Error(), "Expected "+string(valid_type)) {
+	if !strings.Contains(err.Error(), "Expected "+string(validType)) {
 		t.Fatalf("We received an error, but not the correct one: %s\n", err.Error())
 	}
 
