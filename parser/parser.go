@@ -241,7 +241,7 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 			// did not handle.
 			//
 			return nil, fmt.Errorf("Unhandled statement - %v\n", tok)
-			break
+
 		}
 	}
 	return result, nil
