@@ -107,22 +107,28 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 			//
 			// (Here IDENT means "path".)
 			//
-			str1 := p.Tokenizer.NextToken()
-			if str1.Type != "IDENT" {
-				return nil, fmt.Errorf("Expected IDENT as first argument to 'CopyTemplate' - Got %v", str1)
-			}
-
-			str2 := p.Tokenizer.NextToken()
-			if str2.Type != "IDENT" {
-				return nil, fmt.Errorf("Expected IDENT as second argument to 'CopyTemplate' - Got %v", str2)
+			expected := []token.Token{
+				{Type: "IDENT"},
+				{Type: "IDENT"},
 			}
 
 			//
-			// Now we can store this statement
+			// Get the arguments, validating types.
+			//
+			args, err := p.GetArguments(expected)
+
+			//
+			// Error?
+			//
+			if err != nil {
+				return result, err
+			}
+
+			//
+			// Otherwise we can store this statement.
 			//
 			s := statement.Statement{Token: tok}
-			s.Arguments = append(s.Arguments, str1)
-			s.Arguments = append(s.Arguments, str2)
+			s.Arguments = args
 			result = append(result, s)
 			break
 
@@ -136,22 +142,28 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 			//
 			// (Here IDENT means "path".)
 			//
-			str1 := p.Tokenizer.NextToken()
-			if str1.Type != "IDENT" {
-				return nil, fmt.Errorf("Expected IDENT as first argument to 'CopyFile' - Got %v", str1)
-			}
-
-			str2 := p.Tokenizer.NextToken()
-			if str2.Type != "IDENT" {
-				return nil, fmt.Errorf("Expected IDENT as second argument to 'CopyFile' - Got %v", str2)
+			expected := []token.Token{
+				{Type: "IDENT"},
+				{Type: "IDENT"},
 			}
 
 			//
-			// Now we can store this statement
+			// Get the arguments, validating types.
+			//
+			args, err := p.GetArguments(expected)
+
+			//
+			// Error?
+			//
+			if err != nil {
+				return result, err
+			}
+
+			//
+			// Otherwise we can store this statement.
 			//
 			s := statement.Statement{Token: tok}
-			s.Arguments = append(s.Arguments, str1)
-			s.Arguments = append(s.Arguments, str2)
+			s.Arguments = args
 			result = append(result, s)
 			break
 
@@ -161,16 +173,27 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 			//
 			//  1. IDENT
 			//
-			str := p.Tokenizer.NextToken()
-			if str.Type != "IDENT" {
-				return nil, fmt.Errorf("Expected IDENT as first argument to 'DeployTo' - Got %v", str)
+			expected := []token.Token{
+				{Type: "IDENT"},
 			}
 
 			//
-			// Now we can store this statement
+			// Get the arguments, validating types.
+			//
+			args, err := p.GetArguments(expected)
+
+			//
+			// Error?
+			//
+			if err != nil {
+				return result, err
+			}
+
+			//
+			// Otherwise we can store this statement.
 			//
 			s := statement.Statement{Token: tok}
-			s.Arguments = append(s.Arguments, str)
+			s.Arguments = args
 			result = append(result, s)
 			break
 
@@ -181,16 +204,27 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 			//
 			//  1. String
 			//
-			str := p.Tokenizer.NextToken()
-			if str.Type != "STRING" {
-				return nil, fmt.Errorf("Expected STRING as first argument to 'IfChanged' - Got %v", str)
+			expected := []token.Token{
+				{Type: "STRING"},
 			}
 
 			//
-			// Now we can store this statement
+			// Get the arguments, validating types.
+			//
+			args, err := p.GetArguments(expected)
+
+			//
+			// Error?
+			//
+			if err != nil {
+				return result, err
+			}
+
+			//
+			// Otherwise we can store this statement.
 			//
 			s := statement.Statement{Token: tok}
-			s.Arguments = append(s.Arguments, str)
+			s.Arguments = args
 			result = append(result, s)
 			break
 
@@ -201,16 +235,27 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 			//
 			//  1. String
 			//
-			str := p.Tokenizer.NextToken()
-			if str.Type != "STRING" {
-				return nil, fmt.Errorf("Expected STRING as first argument to 'Run' - Got %v", str)
+			expected := []token.Token{
+				{Type: "STRING"},
 			}
 
 			//
-			// Now we can store this statement
+			// Get the arguments, validating types.
+			//
+			args, err := p.GetArguments(expected)
+
+			//
+			// Error?
+			//
+			if err != nil {
+				return result, err
+			}
+
+			//
+			// Otherwise we can store this statement.
 			//
 			s := statement.Statement{Token: tok}
-			s.Arguments = append(s.Arguments, str)
+			s.Arguments = args
 			result = append(result, s)
 			break
 
@@ -222,22 +267,30 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 			//  1. Ident.
 			//  2. String
 			//
-			id := p.Tokenizer.NextToken()
-			if id.Type != "IDENT" {
-				return nil, fmt.Errorf("Expected IDENT as first argument to Set - Got %v", id)
-			}
-			str := p.Tokenizer.NextToken()
-			if str.Type != "STRING" {
-				return nil, fmt.Errorf("Expected STRING as second argument to Set - Got %v", str)
+			expected := []token.Token{
+				{Type: "IDENT"},
+				{Type: "STRING"},
 			}
 
 			//
-			// Now we can store this statement
+			// Get the arguments, validating types.
+			//
+			args, err := p.GetArguments(expected)
+
+			//
+			// Error?
+			//
+			if err != nil {
+				return result, err
+			}
+
+			//
+			// Otherwise we can store this statement.
 			//
 			s := statement.Statement{Token: tok}
-			s.Arguments = append(s.Arguments, id)
-			s.Arguments = append(s.Arguments, str)
+			s.Arguments = args
 			result = append(result, s)
+			break
 
 		case "EOF":
 
@@ -257,4 +310,22 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 		}
 	}
 	return result, nil
+}
+
+// GetArguments fetches arguments from the lexer, ensuring they're
+// the expected types.
+func (p *Parser) GetArguments(expected []token.Token) ([]token.Token, error) {
+	var ret []token.Token
+
+	for i, arg := range expected {
+
+		next := p.Tokenizer.NextToken()
+		if next.Type != arg.Type {
+			return nil, fmt.Errorf("Expected %v as argument %d - Got %v", arg.Type, i, next.Type)
+		}
+
+		ret = append(ret, next)
+
+	}
+	return ret, nil
 }
