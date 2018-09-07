@@ -30,6 +30,9 @@ type Evaluator struct {
 	// Verbose is true if the execution should be verbose.
 	Verbose bool
 
+	// NOP records if we should pretend to work, or work for real.
+	NOP bool
+
 	// Variables is a map which holds the names/values of all defined
 	// variables.  (Being declared/set/updated via the 'Set' primitive.)
 	Variables map[string]string
@@ -55,6 +58,11 @@ func New(program []statement.Statement) *Evaluator {
 // SetVerbose specifies whether we should run verbosely or not.
 func (e *Evaluator) SetVerbose(verb bool) {
 	e.Verbose = verb
+}
+
+// SetNOP specifies whether we should run for real, or not at all.
+func (e *Evaluator) SetNOP(verb bool) {
+	e.NOP = verb
 }
 
 // ConnectTo opens the SSH connection to the specified target-host.
@@ -154,6 +162,9 @@ func (e *Evaluator) Run() error {
 				fmt.Printf("CopyTemplate(\"%s\", \"%s\")\n", src, dst)
 			}
 
+			if e.NOP {
+				break
+			}
 			e.copyFile(src, dst, true)
 			break
 
@@ -174,6 +185,10 @@ func (e *Evaluator) Run() error {
 
 			if e.Verbose {
 				fmt.Printf("CopyFile(\"%s\", \"%s\")\n", src, dst)
+			}
+
+			if e.NOP {
+				break
 			}
 
 			e.copyFile(src, dst, false)
@@ -223,6 +238,10 @@ func (e *Evaluator) Run() error {
 				fmt.Printf("IfChanged(\"%s\")\n", cmd)
 			}
 
+			if e.NOP {
+				break
+			}
+
 			result, err := e.Connection.Exec(cmd)
 			if err != nil {
 				return (fmt.Errorf("Failed to run command '%s': %s\n", cmd, err.Error()))
@@ -247,6 +266,10 @@ func (e *Evaluator) Run() error {
 
 			if e.Verbose {
 				fmt.Printf("Run(\"%s\")\n", cmd)
+			}
+
+			if e.NOP {
+				break
 			}
 
 			result, err := e.Connection.Exec(cmd)

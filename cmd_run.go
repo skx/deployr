@@ -23,6 +23,7 @@ import (
 type runCmd struct {
 	target  string
 	verbose bool
+	nop     bool
 }
 
 //
@@ -40,6 +41,7 @@ func (*runCmd) Usage() string {
 // Flag setup
 //
 func (r *runCmd) SetFlags(f *flag.FlagSet) {
+	f.BoolVar(&r.nop, "nop", false, "No operation - just pretend to run.")
 	f.BoolVar(&r.verbose, "verbose", false, "Run verbosely.")
 	f.StringVar(&r.target, "target", "", "The target host to execute the recipe against.")
 }
@@ -97,9 +99,13 @@ func (r *runCmd) Run(file string) {
 	}
 
 	//
-	// Set the verbosity-level
+	// Set our flags verbosity-level
 	//
 	e.SetVerbose(r.verbose)
+	if r.nop {
+		e.SetVerbose(true)
+		e.SetNOP(true)
+	}
 
 	//
 	// Now run the program.  Hurrah!
