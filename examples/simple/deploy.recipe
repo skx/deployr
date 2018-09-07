@@ -3,7 +3,7 @@
 #
 # Launch it like so:
 #
-#    deployr -target root@host.example.com ./example.recipe
+#    deployr -target root@host.example.com:22 ./deploy.recipe
 #
 
 #
