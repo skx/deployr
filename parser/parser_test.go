@@ -213,7 +213,7 @@ func TestCopy(t *testing.T) {
 			t.Fatalf("Expected to receive an error, got none")
 		}
 
-		if !strings.Contains(err.Error(), "as argument 0") {
+		if !strings.Contains(err.Error(), "as argument 1") {
 			t.Fatalf("Our error was misleading: %s", err.Error())
 		}
 
@@ -238,7 +238,7 @@ func TestCopy(t *testing.T) {
 			t.Fatalf("Expected to receive an error, got none")
 		}
 
-		if !strings.Contains(err.Error(), "as argument 1") {
+		if !strings.Contains(err.Error(), "as argument 2") {
 			t.Fatalf("Our error was misleading %s", err.Error())
 		}
 
@@ -421,7 +421,7 @@ func TestSet(t *testing.T) {
 		t.Fatalf("Expected to receive an error, got none")
 	}
 
-	if !strings.Contains(err.Error(), "as argument 0") {
+	if !strings.Contains(err.Error(), "as argument 1") {
 		t.Fatalf("Our error was misleading:%s", err.Error())
 	}
 
@@ -446,7 +446,7 @@ func TestSet(t *testing.T) {
 		t.Fatalf("Expected to receive an error, got none")
 	}
 
-	if !strings.Contains(err.Error(), "as argument 1") {
+	if !strings.Contains(err.Error(), "as argument 2") {
 		t.Fatalf("Our error was misleading: %s", err.Error())
 	}
 }

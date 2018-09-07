@@ -111,17 +111,17 @@ The following variables are defined by default:
 
 
 
-
 ## Template Expansion
 
 In addition to copying files literally from the local system to the remote
 host it is also possible perform some limited template-expansion.
 
-To copy a file literally you'd use the `CopyFile` primitive:
+To copy a file literally you'd use the `CopyFile` primitive which copies the
+file with no regards to the contents (handling binary content):
 
     CopyFile local.txt /tmp/remote.txt
 
-To copy a file with template-expansion performed upon its contents you use the `CopyTemplate` primitive instead:
+To copy a file with template-expansion you should use the `CopyTemplate` primitive instead:
 
     CopyTemplate local.txt /tmp/remote.txt
 
@@ -136,9 +136,11 @@ which means you can access values like so:
     # at {{now.UTC.Day}} {{now.UTC.Month}} {{now.UTC.Year}}
     #
 
-In short you write `{{get "variable-name-here}}` and the value of the variable
+In short you write `{{get "variable-name-here"}}` and the value of the variable
 will be output inline.
 
+Any variable defined with `Set` will be available to you, as well as the
+[predefined variables](#predefined-variables) noted above.
 
 
 
