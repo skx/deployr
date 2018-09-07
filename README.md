@@ -95,6 +95,32 @@ In the following example we declare the variable called "RELEASE" to have the va
     Run "wget -O /usr/local/bin/app-${RELEASE} \
            https://example.com/dist/app-${RELEASE}"
 
+It is possible to override the value of a particular variable via a command-line argument, for example:
+
+    $ deployr run --set "ENVIRONMENT=PRODUCTION" ...
+
+If you do this any attempt to `Set` the variable inside the recipe itself will be silently ignored.  (i.e. A variable which is set on the command-line will become essentially read-only.)   This is useful if you have a recipe where the only real difference is the set of configuration files, and the destination host.  For example you could write all your copies like so:
+
+    #
+    # Lack of recursive copy is a pain here.
+    # See:
+    #   https://github.com/skx/deployr/issues/6
+    #
+    CopyFile files/${ENVIRONMENT}/etc/apache2.conf /etc/apache2/conf
+    CopyFile files/${ENVIRONMENT}/etc/redis.conf   /etc/redis/redis.conf
+    ..
+
+Then have a tree of files:
+
+      ├── files
+          ├── development
+          │   ├── apache2.conf
+          │   └── redis.conf
+          └── production
+              ├── apache2.conf
+              └── redis.conf
+
+
 
 ### Predefined Variables
 
