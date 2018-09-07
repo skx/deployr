@@ -74,6 +74,18 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 			// or an unterminated string.
 			//
 			return result, fmt.Errorf("Error received from the lexer - %s\n", tok.Literal)
+		case "IDENT":
+			//
+			// If we find a bare-ident which is not an argument
+			// then we're either out of sync with reality or
+			// the user has tried to run a bogus-program:
+			//
+			//   /usr/bin/id
+			//   Run "/usr/bin/id"
+			//
+			// Either way this is an error.
+			//
+			return result, fmt.Errorf("Found unexpected identifier '%s'\n", tok.Literal)
 		case "STRING":
 			//
 			// If we find a bare-string which is not an argument

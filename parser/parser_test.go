@@ -274,6 +274,35 @@ func TestBareString(t *testing.T) {
 	}
 }
 
+// TestBareIdentifier tests our error-handling.
+func TestBareIdentifier(t *testing.T) {
+
+	//
+	// The stream of tokens we'll parse.
+	//
+	toks := []token.Token{
+		{Type: "IDENTIFIER", Literal: "/bin/ls"},
+		{Type: "EOF", Literal: "EOF"},
+	}
+
+	//
+	// Now parse into statements.
+	//
+	fl := NewFakeLexer(toks)
+	p := New(fl)
+	program, err := p.Parse()
+
+	//
+	// We expect one statement, with zero errors.
+	//
+	if err == nil {
+		t.Fatalf("We expected an error, but saw none!")
+	}
+	if len(program) != 0 {
+		t.Fatalf("Unexpected length, wanted 0 got %d\n", len(program))
+	}
+}
+
 // TestDefault tests our unhandled-token setting.
 func TestDefault(t *testing.T) {
 
