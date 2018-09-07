@@ -71,13 +71,13 @@ Each specified recipe is parsed and the primitives inside them are then executed
 
 There are several examples included beneath [examples/](examples/), [examples/simple/](examples/simple/) is a good place to get a feel of the flavour.
 
-    $ cd ./examples.simple/
-    $ deployr run -target [user@]host.example.com[:port] ./example.recipe
+    $ cd ./examples/simple/
+    $ deployr run -target [user@]host.example.com[:port] ./deployr.recipe
 
 For more verbose output the `-verbose` flag may be added:
 
-    $ cd ./examples.simple/
-    $ deployr run -target [user@]host.example.com[:port] -verbose ./example.recipe
+    $ cd ./examples/simple/
+    $ deployr run -target [user@]host.example.com[:port] -verbose ./deployr.recipe
 
 
 
