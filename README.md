@@ -69,12 +69,14 @@ Each specified recipe is parsed and the primitives inside them are then executed
      Run "/usr/bin/id"
      IfChanged "/usr/bin/uptime"
 
-The included [example.recipe](example.recipe) demonstrates some of these commands, and can be launched like so:
+There are several examples included beneath [examples/](examples/), [examples/simple/](examples/simple/) is a good place to get a feel of the flavour.
 
+    $ cd ./examples.simple/
     $ deployr run -target [user@]host.example.com[:port] ./example.recipe
 
 For more verbose output the `-verbose` flag may be added:
 
+    $ cd ./examples.simple/
     $ deployr run -target [user@]host.example.com[:port] -verbose ./example.recipe
 
 
