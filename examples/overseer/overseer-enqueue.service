@@ -1,0 +1,8 @@
+[Unit]
+Description=Add tests to be executed by oveseer
+RefuseManualStart=no
+RefuseManualStop=yes
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c '/opt/overseer/bin/overseer enqueue -redis-host=localhost:6379 /opt/overseer/tests.d/*.conf'

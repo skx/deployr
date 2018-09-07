@@ -1,0 +1,15 @@
+[Unit]
+Description=overseer worker-service
+
+[Service]
+User=root
+WorkingDirectory=/opt/overseer
+Environment="METRICS=metrics.steve.fi"
+ExecStart=/opt/overseer/bin/overseer worker -redis-host=127.0.0.1:6379
+KillMode=process
+Restart=always
+StartLimitInterval=2
+StartLimitBurst=20
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,16 @@
+[Unit]
+Description=puppet-summary service
+
+[Service]
+WorkingDirectory=/srv/puppet-summary
+User=p-s
+Environment="METRICS=metrics.steve.fi"
+ExecStart=/srv/puppet-summary/puppet-summary serve
+Restart=always
+StartLimitInterval=2
+StartLimitBurst=20
+PrivateTmp=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+[Install]
+WantedBy=multi-user.target

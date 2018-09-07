@@ -1,0 +1,78 @@
+#
+# Deploy overseer - this consists of two files.
+#
+
+#
+# Specify the host to which we're deploying.
+#
+# Public-key authentication is both assumed and required.
+#
+DeployTo root@alert.steve.fi:2222
+
+#
+# Set the release version as a variable named "RELEASE".
+#
+Set RELEASE "1.6"
+
+#
+# The path where we deploy applications.
+#
+Set BIN "/opt/overseer/bin"
+
+#
+# Ensure we have a destination directory
+#
+Run "mkdir -p /opt/overseer/bin >/dev/null"
+
+#
+# Fetch overseer, copy it into place, and symlink it.
+#
+Run "wget --quiet -O ${BIN}/tmp.overseer-linux-amd64-${RELEASE} \
+    https://github.com/skx/overseer/releases/download/release-${RELEASE}/overseer-linux-amd64"
+Run "mv ${BIN}/tmp.overseer-linux-amd64-${RELEASE} \
+    ${BIN}/overseer-linux-amd64-${RELEASE}"
+Run "ln -sf ${BIN}/overseer-linux-amd64-${RELEASE} \
+    ${BIN}/overseer"
+
+#
+# Fetch our bridge, copy it into place, and symlink it.
+#
+Run "wget --quiet -O ${BIN}/tmp.purppura-bridge-linux-amd64-${RELEASE} \
+    https://github.com/skx/overseer/releases/download/release-${RELEASE}/purppura-bridge-linux-amd64"
+Run "mv ${BIN}/tmp.purppura-bridge-linux-amd64-${RELEASE} \
+    ${BIN}/purppura-bridge-linux-amd64-${RELEASE}"
+Run "ln -sf ${BIN}/purppura-bridge-linux-amd64-${RELEASE} \
+   ${BIN}/purppura-bridge"
+
+#
+# Ensure the downloaded files are executable.
+#
+Run "chmod 755 ${BIN}/*"
+
+#
+# Finally we need to make sure there are systemd unit-files in-place,
+# for handling the parsing/polling.
+#
+CopyFile overseer-enqueue.service /lib/systemd/system/overseer-enqueue.service
+IfChanged "systemctl daemon-reload"
+IfChanged "systemctl enable overseer-enqueue.service"
+
+CopyFile overseer-enqueue.timer /lib/systemd/system/overseer-enqueue.timer
+IfChanged "systemctl daemon-reload"
+IfChanged "systemctl enable overseer-enqueue.timer"
+
+CopyFile overseer-worker.service /lib/systemd/system/overseer-worker.service
+IfChanged "systemctl daemon-reload"
+IfChanged "systemctl enable overseer-worker.service"
+
+CopyFile purppura-bridge.service /lib/systemd/system/purppura-bridge.service
+IfChanged "systemctl daemon-reload"
+IfChanged "systemctl enable purppura-bridge.service"
+
+#
+# Stop + Start the services
+#
+Run "systemctl stop  overseer-worker.service"
+Run "systemctl start overseer-worker.service"
+Run "systemctl stop  purppura-bridge.service"
+Run "systemctl start purppura-bridge.service"

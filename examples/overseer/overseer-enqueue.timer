@@ -1,0 +1,12 @@
+[Unit]
+Description=Populate the overseer work-queue
+RefuseManualStart=no
+RefuseManualStop=no
+
+[Timer]
+Persistent=false
+OnCalendar=*:0/2
+Unit=overseer-enqueue.service
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,69 @@
+#
+# Deploy Steve's puppet-summary application.
+#
+# The puppet-summary application is developed on github, and only
+# fixed releases are installed via release-page of the project:
+#
+#    https://github.com/skx/puppet-summary/releases
+#
+# The software is deployed to the single host `master.steve.org.uk`
+# and I connect to that host via SSH as the root-user.
+#
+# At the time of writing the most recent release is version 1.2
+#
+
+
+#
+# Specify the host to which we're deploying.
+#
+# Public-key authentication is both assumed and required.
+#
+DeployTo root@master.steve.org.uk:2222
+
+#
+# Set the release version as a variable named "RELEASE".
+#
+Set RELEASE "1.2"
+
+#
+# Now that RELEASE is defined it can be used as ${RELEASE} in the rest of
+# this file.
+#
+
+#
+# To deploy the software I need to fetch it.  Do that with `wget`:
+#
+Run "wget --quiet -O /srv/puppet-summary/tmp.puppet-summary-linux-amd64-${RELEASE} \
+    https://github.com/skx/puppet-summary/releases/download/release-${RELEASE}/puppet-summary-linux-amd64"
+
+#
+# Copy it into-place
+#
+Run "mv /srv/puppet-summary/tmp.puppet-summary-linux-amd64-${RELEASE}  \
+ /srv/puppet-summary/puppet-summary-linux-amd64-${RELEASE}"
+
+#
+# Create a symlink from this versioned download to an unqualified name.
+#
+Run "ln -sf /srv/puppet-summary/puppet-summary-linux-amd64-${RELEASE} \
+   /srv/puppet-summary/puppet-summary"
+
+
+#
+# Ensure the downloaded file is executable.
+#
+Run "chmod 755 /srv/puppet-summary/puppet*"
+
+#
+# Finally we need to make sure there is a systemd unit-file in-place which
+# will start the service
+#
+CopyFile puppet-summary.service /lib/systemd/system/puppet-summary.service
+IfChanged "systemctl daemon-reload"
+IfChanged "systemctl enable puppet-summary.service"
+
+#
+# And now we should be able to stop/start the service
+#
+Run "systemctl stop  puppet-summary.service"
+Run "systemctl start puppet-summary.service"

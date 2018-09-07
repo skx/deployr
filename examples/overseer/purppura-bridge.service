@@ -1,0 +1,15 @@
+[Unit]
+Description=purppura-bridge
+
+[Service]
+User=nobody
+WorkingDirectory=/opt/overseer
+Environment="METRICS=metrics.steve.fi"
+ExecStart=/opt/overseer/bin/purppura-bridge -redis-host=127.0.0.1:6379 -purppura=https://alert.steve.fi/events
+KillMode=process
+Restart=always
+StartLimitInterval=2
+StartLimitBurst=20
+
+[Install]
+WantedBy=multi-user.target
