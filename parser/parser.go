@@ -321,7 +321,7 @@ func (p *Parser) GetArguments(expected []token.Token) ([]token.Token, error) {
 
 		next := p.Tokenizer.NextToken()
 		if next.Type != arg.Type {
-			return nil, fmt.Errorf("Expected %v as argument %d - Got %v", arg.Type, i, next.Type)
+			return nil, fmt.Errorf("Expected %v as argument %d - Got %v", arg.Type, i+1, next.Type)
 		}
 
 		ret = append(ret, next)
