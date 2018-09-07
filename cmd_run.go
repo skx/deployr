@@ -9,6 +9,8 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"regexp"
+	"strings"
 
 	"github.com/google/subcommands"
 	"github.com/skx/deployr/evaluator"
@@ -17,13 +19,37 @@ import (
 	"github.com/skx/deployr/util"
 )
 
+// arrayFlags is the type of a flag that can be duplicated
+type arrayFlags []string
+
+// String returns a human-readable version of the flags-set
+func (i *arrayFlags) String() string {
+	return strings.Join(*i, ",")
+}
+
+// Set updates the value of this flag, by appending to the list.
+func (i *arrayFlags) Set(value string) error {
+	*i = append(*i, value)
+	return nil
+}
+
 //
 // runCmd holds the state for this sub-command.
 //
 type runCmd struct {
-	target  string
+	// nop is true if we should pretend to run commands, not actually
+	// run them for real.
+	nop bool
+
+	// target allows the target against which the recipe runs to be
+	// set on the command-line.
+	target string
+
+	// vars stores any variables which are specified on the command-line.
+	vars arrayFlags
+
+	// verbose is true if we should be extra-verbose when running.
 	verbose bool
-	nop     bool
 }
 
 //
@@ -44,6 +70,7 @@ func (r *runCmd) SetFlags(f *flag.FlagSet) {
 	f.BoolVar(&r.nop, "nop", false, "No operation - just pretend to run.")
 	f.BoolVar(&r.verbose, "verbose", false, "Run verbosely.")
 	f.StringVar(&r.target, "target", "", "The target host to execute the recipe against.")
+	f.Var(&r.vars, "set", "Set the value of a particular variable.  (May be repeated.)")
 }
 
 //
@@ -105,6 +132,18 @@ func (r *runCmd) Run(file string) {
 	if r.nop {
 		e.SetVerbose(true)
 		e.SetNOP(true)
+	}
+
+	//
+	// Are there any variables set on the command-line?
+	//
+	re := regexp.MustCompile("^([^=]+)=(.*)$")
+	for _, set := range r.vars {
+
+		matches := re.FindStringSubmatch(set)
+		if len(matches) == 3 {
+			e.SetVariable(matches[1], matches[2])
+		}
 	}
 
 	//

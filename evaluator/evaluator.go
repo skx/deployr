@@ -37,6 +37,11 @@ type Evaluator struct {
 	// variables.  (Being declared/set/updated via the 'Set' primitive.)
 	Variables map[string]string
 
+	// ROVariables is a map which is similar to Variables, but only
+	// contains values set on the command-line.  Variables are looked
+	// for here first.
+	ROVariables map[string]string
+
 	// Connection holds the SSH-connection to the remote-host.
 	Connection *simplessh.Client
 
@@ -49,8 +54,9 @@ type Evaluator struct {
 func New(program []statement.Statement) *Evaluator {
 	p := &Evaluator{Program: program}
 
-	// Setup the map for storing variable names/values.
+	// Setup the maps for storing variable names & values.
 	p.Variables = make(map[string]string)
+	p.ROVariables = make(map[string]string)
 
 	return p
 }
@@ -362,6 +368,9 @@ func (e *Evaluator) copyFile(local string, remote string, expand bool) {
 		//
 		funcMap := template.FuncMap{
 			"get": func(s string) string {
+				if len(e.ROVariables[s]) > 0 {
+					return (e.ROVariables[s])
+				}
 				return (e.Variables[s])
 			},
 			"now": time.Now,
@@ -503,11 +512,25 @@ func (e *Evaluator) expandString(in string) string {
 		in = strings.TrimPrefix(in, "${")
 		in = strings.TrimSuffix(in, "}")
 
+		// Look for read-only variables first
+		if len(e.ROVariables[in]) > 0 {
+			return (e.ROVariables[in])
+		}
+
+		// Now look for normal-variable
 		if len(e.Variables[in]) > 0 {
 			return (e.Variables[in])
 		}
+
+		// Finally we found neither, just leave the
+		// expansion alone.
 		return "${" + in + "}"
 	})
 
 	return in
+}
+
+// SetVariable sets the content of a read-only variable
+func (e *Evaluator) SetVariable(key string, val string) {
+	e.ROVariables[key] = val
 }
