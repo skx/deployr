@@ -28,6 +28,9 @@ type Evaluator struct {
 	// Program is our parsed program, which is an array of statements.
 	Program []statement.Statement
 
+	// Identity holds the SSH key to authenticate with
+	Identity string
+
 	// Verbose is true if the execution should be verbose.
 	Verbose bool
 
@@ -62,14 +65,23 @@ func New(program []statement.Statement) *Evaluator {
 	return p
 }
 
-// SetVerbose specifies whether we should run verbosely or not.
-func (e *Evaluator) SetVerbose(verb bool) {
-	e.Verbose = verb
+// SetIdentity specifies the SSH identity file to authenticate with
+func (e *Evaluator) SetIdentity(file string) {
+	if file != "" {
+		e.Identity = file
+	} else {
+		e.Identity = os.Getenv("HOME") + "/.ssh/id_rsa"
+	}
 }
 
 // SetNOP specifies whether we should run for real, or not at all.
 func (e *Evaluator) SetNOP(verb bool) {
 	e.NOP = verb
+}
+
+// SetVerbose specifies whether we should run verbosely or not.
+func (e *Evaluator) SetVerbose(verb bool) {
+	e.Verbose = verb
 }
 
 // ConnectTo opens the SSH connection to the specified target-host.
@@ -128,7 +140,7 @@ func (e *Evaluator) ConnectTo(target string) error {
 	//
 	// Finally connect.
 	//
-	e.Connection, err = simplessh.ConnectWithKeyFile(destination, user, os.Getenv("HOME")+"/.ssh/id_rsa")
+	e.Connection, err = simplessh.ConnectWithKeyFile(destination, user, e.Identity)
 	if err != nil {
 		return err
 	}

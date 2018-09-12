@@ -87,6 +87,7 @@ For more verbose output the `-verbose` flag may be added:
     $ cd ./examples/simple/
     $ deployr run -target [user@]host.example.com[:port] -verbose ./deployr.recipe
 
+Some other flags are also available, consult "`deployr help run`" for details.
 
 
 ## Variables

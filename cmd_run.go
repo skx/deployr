@@ -41,6 +41,9 @@ type runCmd struct {
 	// run them for real.
 	nop bool
 
+	// identity holds the SSH identity file to use.
+	identity string
+
 	// target allows the target against which the recipe runs to be
 	// set on the command-line.
 	target string
@@ -69,6 +72,7 @@ func (*runCmd) Usage() string {
 func (r *runCmd) SetFlags(f *flag.FlagSet) {
 	f.BoolVar(&r.nop, "nop", false, "No operation - just pretend to run.")
 	f.BoolVar(&r.verbose, "verbose", false, "Run verbosely.")
+	f.StringVar(&r.identity, "identity", "", "The identity file to use for key-based authentication.")
 	f.StringVar(&r.target, "target", "", "The target host to execute the recipe against.")
 	f.Var(&r.vars, "set", "Set the value of a particular variable.  (May be repeated.)")
 }
@@ -133,6 +137,11 @@ func (r *runCmd) Run(file string) {
 		e.SetVerbose(true)
 		e.SetNOP(true)
 	}
+
+	//
+	// Save the identity-flag - the default is ~/.ssh/id_rsa
+	//
+	e.SetIdentity(r.identity)
 
 	//
 	// Are there any variables set on the command-line?
