@@ -264,7 +264,7 @@ func TestBareString(t *testing.T) {
 	program, err := p.Parse()
 
 	//
-	// We expect one statement, with zero errors.
+	// We expect to receive an error & empty-program
 	//
 	if err == nil {
 		t.Fatalf("We expected an error, but saw none!")
@@ -281,7 +281,7 @@ func TestBareIdentifier(t *testing.T) {
 	// The stream of tokens we'll parse.
 	//
 	toks := []token.Token{
-		{Type: "IDENTIFIER", Literal: "/bin/ls"},
+		{Type: "IDENT", Literal: "/bin/ls"},
 		{Type: "EOF", Literal: "EOF"},
 	}
 
@@ -293,7 +293,7 @@ func TestBareIdentifier(t *testing.T) {
 	program, err := p.Parse()
 
 	//
-	// We expect one statement, with zero errors.
+	// We expect to receive an error & empty-program
 	//
 	if err == nil {
 		t.Fatalf("We expected an error, but saw none!")
@@ -448,5 +448,34 @@ func TestSet(t *testing.T) {
 
 	if !strings.Contains(err.Error(), "as argument 2") {
 		t.Fatalf("Our error was misleading: %s", err.Error())
+	}
+}
+
+// TestSudo tests that we have sudo-handing correct.
+func TestSudoHandling(t *testing.T) {
+
+	//
+	// The stream of tokens we'll parse.
+	//
+	toks := []token.Token{
+		{Type: "Sudo", Literal: "Sudo"},
+		{Type: "EOF", Literal: "EOF"},
+	}
+
+	//
+	// Now parse into statements.
+	//
+	fl := NewFakeLexer(toks)
+	p := New(fl)
+	program, err := p.Parse()
+
+	//
+	// We expect one statement, with zero errors.
+	//
+	if err != nil {
+		t.Fatalf("Received an unexpected error!")
+	}
+	if len(program) != 0 {
+		t.Fatalf("Unexpected length, wanted 0 got %d\n", len(program))
 	}
 }
