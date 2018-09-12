@@ -20,6 +20,10 @@ type Statement struct {
 	// Token is the main action "Set", "Run", etc.
 	Token token.Token
 
+	// When running a command `Run`, `IfChanged` should we use
+	// sudo?
+	Sudo bool
+
 	// Arguments contains the arguments to the operation.
 	Arguments []token.Token
 }

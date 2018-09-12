@@ -46,6 +46,11 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 	var result []statement.Statement
 
 	//
+	// Does the next command use Sudo?
+	//
+	sudo := false
+
+	//
 	// We have a lexer, so we process each token in-turn until we
 	// hit the end-of-file.
 	//
@@ -225,6 +230,13 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 			//
 			s := statement.Statement{Token: tok}
 			s.Arguments = args
+
+			//
+			// Perserve the SUDO state
+			//
+			s.Sudo = sudo
+			sudo = false
+
 			result = append(result, s)
 			break
 
@@ -256,6 +268,13 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 			//
 			s := statement.Statement{Token: tok}
 			s.Arguments = args
+
+			//
+			// Perserve the SUDO state
+			//
+			s.Sudo = sudo
+			sudo = false
+
 			result = append(result, s)
 			break
 
@@ -290,6 +309,10 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 			s := statement.Statement{Token: tok}
 			s.Arguments = args
 			result = append(result, s)
+			break
+
+		case "Sudo":
+			sudo = true
 			break
 
 		case "EOF":

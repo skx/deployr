@@ -1,0 +1,35 @@
+#
+# This is a simple recipe which demonstrates the usage of "sudo".
+#
+# Launch it like so:
+#
+#   $ deployr -target user@host.example.com:22 ./deploy.recipe
+#
+# Sample output:
+#
+#   $ deployr run -target steve@host.example.com deploy.recipe
+#   Please enter your password for sudo: s4cr3t
+#
+#   This command runs as "steve"
+#   uid=1000(steve) gid=100(users) groups=100(users),1007(steve),1034(ssh_users)
+#
+#   This command runs as "root"
+#   uid=0(root) gid=0(root) groups=0(root),1034(ssh_users)
+#
+#
+
+
+
+#
+# "Run" executes a command as the user we connect with.
+#
+Run "echo 'This command runs as \"${user}\"'"
+Run "/usr/bin/id"
+
+
+
+#
+# "Sudo Run" runs a command as root.
+#
+Run "echo 'This command runs as \"root\"'"
+Sudo Run "/usr/bin/id"
