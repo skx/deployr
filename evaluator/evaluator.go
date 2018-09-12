@@ -7,6 +7,7 @@
 package evaluator
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"io/ioutil"
@@ -140,6 +141,32 @@ func (e *Evaluator) ConnectTo(target string) error {
 func (e *Evaluator) Run() error {
 
 	//
+	// Do any of our program-statements require the use of Sudo?
+	//
+	sudo := false
+	for _, statement := range e.Program {
+		if statement.Sudo {
+			sudo = true
+		}
+	}
+
+	//
+	// OK we need a sudo-password.  So prompt for it.
+	//
+	sudoPassword := ""
+	if sudo {
+		fmt.Printf("Please enter your password for sudo: ")
+
+		reader := bufio.NewReader(os.Stdin)
+		text, err := reader.ReadString('\n')
+
+		if err != nil {
+			return err
+		}
+		sudoPassword = text
+	}
+
+	//
 	// For each statement ..
 	//
 	for _, statement := range e.Program {
@@ -241,6 +268,9 @@ func (e *Evaluator) Run() error {
 			cmd := e.expandString(statement.Arguments[0].Literal)
 
 			if e.Verbose {
+				if statement.Sudo {
+					fmt.Printf("Sudo ")
+				}
 				fmt.Printf("IfChanged(\"%s\")\n", cmd)
 			}
 
@@ -248,7 +278,20 @@ func (e *Evaluator) Run() error {
 				break
 			}
 
-			result, err := e.Connection.Exec(cmd)
+			//
+			// Holder for results of execution.
+			//
+			var result []byte
+			var err error
+
+			//
+			// Run via sudo or normally.
+			//
+			if statement.Sudo {
+				result, err = e.Connection.ExecSudo(cmd, sudoPassword)
+			} else {
+				result, err = e.Connection.Exec(cmd)
+			}
 			if err != nil {
 				return (fmt.Errorf("Failed to run command '%s': %s\n", cmd, err.Error()))
 			}
@@ -271,6 +314,10 @@ func (e *Evaluator) Run() error {
 			cmd := e.expandString(statement.Arguments[0].Literal)
 
 			if e.Verbose {
+				if statement.Sudo {
+					fmt.Printf("Sudo ")
+				}
+
 				fmt.Printf("Run(\"%s\")\n", cmd)
 			}
 
@@ -278,7 +325,20 @@ func (e *Evaluator) Run() error {
 				break
 			}
 
-			result, err := e.Connection.Exec(cmd)
+			//
+			// Holder for results of execution.
+			//
+			var result []byte
+			var err error
+
+			//
+			// Run via sudo or normally.
+			//
+			if statement.Sudo {
+				result, err = e.Connection.ExecSudo(cmd, sudoPassword)
+			} else {
+				result, err = e.Connection.Exec(cmd)
+			}
 			if err != nil {
 				return (fmt.Errorf("Failed to run command '%s': %s\n", cmd, err.Error()))
 			}
@@ -305,6 +365,12 @@ func (e *Evaluator) Run() error {
 
 			break
 
+		case "Sudo":
+
+			//
+			// This is an error?
+			//
+			break
 		default:
 			return fmt.Errorf("Unhandled statement - %v\n", statement.Token)
 		}
