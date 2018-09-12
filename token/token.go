@@ -23,6 +23,7 @@ const (
 	IF_CHANGED    = "IfChanged"
 	RUN           = "Run"
 	SET           = "Set"
+	SUDO          = "Sudo"
 )
 
 // keywords holds our reversed keywords
@@ -33,6 +34,7 @@ var keywords = map[string]TokenType{
 	"IfChanged":    IF_CHANGED,
 	"Run":          RUN,
 	"Set":          SET,
+	"Sudo":         SUDO,
 }
 
 // LookupIdentifier used to determinate whether identifier is keyword nor not
