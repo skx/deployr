@@ -451,7 +451,7 @@ func TestSet(t *testing.T) {
 	}
 }
 
-// TestSudo tests that we have sudo-handing correct.
+// TestSudoHandling tests that we have sudo-handing correct.
 func TestSudoHandling(t *testing.T) {
 
 	//
@@ -477,5 +477,79 @@ func TestSudoHandling(t *testing.T) {
 	}
 	if len(program) != 0 {
 		t.Fatalf("Unexpected length, wanted 0 got %d\n", len(program))
+	}
+}
+
+// TestSudoFlag tests that we actually set the flag for a sudo-using
+// command.
+func TestSudoFlag(t *testing.T) {
+
+	//
+	// The stream of tokens we'll expecting a sudo-flag to be set.
+	//
+	set := []token.Token{
+		{Type: "Sudo", Literal: "Sudo"},
+		{Type: "Run", Literal: "Run"},
+		{Type: "STRING", Literal: "/bin/ls"},
+		{Type: "EOF", Literal: "EOF"},
+	}
+
+	//
+	// The stream of tokens we'll parse expecting no sudo-flag to be
+	// set.
+	//
+	unset := []token.Token{
+		{Type: "Run", Literal: "Run"},
+		{Type: "STRING", Literal: "/bin/ls"},
+		{Type: "EOF", Literal: "EOF"},
+	}
+
+	//
+	// Now parse into statements.
+	//
+	fl := NewFakeLexer(set)
+	p := New(fl)
+	program, err := p.Parse()
+
+	//
+	// We expect one statement, with zero errors.
+	//
+	if err != nil {
+		t.Fatalf("Received an unexpected error!")
+	}
+	if len(program) != 1 {
+		t.Fatalf("Unexpected length, wanted 1 got %d\n", len(program))
+	}
+
+	//
+	// The statement will use sudo
+	//
+
+	if program[0].Sudo != true {
+		t.Fatalf("We expected our Run command to use sudo %v", program[0])
+	}
+
+	//
+	// Now parse into statements.
+	//
+	fl = NewFakeLexer(unset)
+	p = New(fl)
+	program, err = p.Parse()
+
+	//
+	// We expect one statement, with zero errors.
+	//
+	if err != nil {
+		t.Fatalf("Received an unexpected error!")
+	}
+	if len(program) != 1 {
+		t.Fatalf("Unexpected length, wanted 1 got %d\n", len(program))
+	}
+
+	//
+	// The statement will not use sudo
+	//
+	if program[0].Sudo != false {
+		t.Fatalf("We didn't expect our Run command to use sudo %v", program[0])
 	}
 }
