@@ -68,6 +68,9 @@ Each specified recipe is parsed and the primitives inside them are then executed
 * `Set name "value"`
   * Set the variable "name" to have the value "value".
   * Once set a variable can be used in the recipe, or as part of template-expansion.
+* `Sudo` may be added as a prefix to `Run` and `IfChanged`.
+  * If present this will ensure the specified command runs as `root`.
+  * The sudo example found beneath [examples/sudo/](examples/sudo/) demonstrates usage.
 
 **NOTE**: Previously the "Run" and "IfChanged" primitives took bare arguments, now they __must__ be quoted.  For example:
 
