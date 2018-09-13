@@ -54,9 +54,11 @@ Each specified recipe is parsed and the primitives inside them are then executed
 * `CopyFile local/path remote/path`
   * Copy the specified local file to the specified path on the remote system.
   * If the local & remote files were identical, such that no change was made, then this fact will be noted.
+  * See later note on globs.
 * `CopyTemplate local/path remote/path`
   * Copy the specified local file to the specified path on the remote system, expanding variables prior to running the copy.
   * If the local & remote files were identical, such that no change was made, then this fact will be noted.
+  * See later note on globs.
 * `DeployTo [user@]hostname[:port]`
   * Specify the details of the host to connect to, this is useful if a particular recipe should only be applied against a single host.
   * If you don't specify a target within your recipe itself you can instead pass it upon the command-line via the `-target` flag.
@@ -72,10 +74,8 @@ Each specified recipe is parsed and the primitives inside them are then executed
   * If present this will ensure the specified command runs as `root`.
   * The sudo example found beneath [examples/sudo/](examples/sudo/) demonstrates usage.
 
-**NOTE**: Previously the "Run" and "IfChanged" primitives took bare arguments, now they __must__ be quoted.  For example:
 
-     Run "/usr/bin/id"
-     IfChanged "/usr/bin/uptime"
+### Examples
 
 There are several examples included beneath [examples/](examples/), the shortest one [examples/simple/](examples/simple/) is a particularly good recipe to examine to get a feel for the system:
 
@@ -88,6 +88,33 @@ For more verbose output the `-verbose` flag may be added:
     $ deployr run -target [user@]host.example.com[:port] -verbose ./deployr.recipe
 
 Some other flags are also available, consult "`deployr help run`" for details.
+
+
+### File Globs
+
+Both the `CopyFile` and `CopyTemplate` primitives allow the use of file-globs,
+which allows you to write a line like this:
+
+    CopyFile lib/systemd/system/* /lib/systemd/system/
+
+Assuming you have the following input this will copy all the files, as you
+would expect:
+
+      ├── deploy.recipe
+      └── lib
+          └── systemd
+              └── system
+                  ├── overseer-enqueue.service
+                  ├── overseer-enqueue.timer
+                  ├── overseer-worker.service
+                  └── purppura-bridge.service
+
+**NOTE** That this wildcard support is _not_ the same as a recursive copy,
+that is not supported.
+
+The `IfChanged` primitive will regard a previous copy operation as having
+resulted in a change if any single file changes during the run of a copy
+operation that invovles a glob.
 
 
 ## Variables

@@ -12,6 +12,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"text/template"
@@ -210,7 +212,7 @@ func (e *Evaluator) Run() error {
 			if e.NOP {
 				break
 			}
-			e.copyFile(src, dst, true)
+			e.Changed = e.copyFiles(src, dst, true)
 			break
 
 		case "CopyFile":
@@ -236,7 +238,7 @@ func (e *Evaluator) Run() error {
 				break
 			}
 
-			e.copyFile(src, dst, false)
+			e.Changed = e.copyFiles(src, dst, false)
 			break
 
 		case "DeployTo":
@@ -404,6 +406,81 @@ func (e *Evaluator) Run() error {
 	return nil
 }
 
+// copyFiles is designed to copy a file/template from the local
+// system to the remote host.
+//
+// It might be called with a glob, or with a single file.
+//
+func (e *Evaluator) copyFiles(pattern string, destination string, expand bool) bool {
+
+	//
+	// If our input pattern ends with a "/" we just add "*"
+	//
+	if strings.HasSuffix(pattern, "/") {
+		pattern += "*"
+	}
+
+	//
+	// Expand the pattern we received.
+	//
+	files, err := filepath.Glob(pattern)
+	if err != nil {
+		return false
+	}
+
+	//
+	// Did we receive more than one file?
+	//
+	if len(files) == 1 {
+
+		//
+		// OK just copying a single file.
+		//
+		return (e.copyFile(pattern, destination, expand))
+	}
+
+	//
+	// OK we now have to copy each entry.  Since we're copying
+	// from a pattern our destination will need to be updated ensure
+	// we have a trailing "/" for that.
+	//
+	if !strings.HasSuffix(destination, "/") {
+		destination += "/"
+	}
+
+	//
+	// We record a change if we updated ANY of the files.
+	//
+	changed := false
+
+	//
+	// Now process each file.
+	//
+	for _, file := range files {
+
+		fi, err := os.Stat(file)
+		if err != nil {
+			fmt.Printf("Failed to stat(%s) %s\n", file, err.Error())
+			continue
+		}
+		switch mode := fi.Mode(); {
+		case mode.IsDir():
+			if e.Verbose {
+				fmt.Printf("Skipping directory %s\n", file)
+			}
+		case mode.IsRegular():
+			name := path.Base(file)
+			c := e.copyFile(file, destination+name, expand)
+			if c {
+				changed = c
+			}
+		}
+	}
+
+	//
+	return changed
+}
+
 // copyFile is designed to copy the local file to the remote system.
 //
 // It is a little complex because it does two extra things:
@@ -412,8 +489,21 @@ func (e *Evaluator) Run() error {
 //
 // * It optionally expands template-variables.
 //
-func (e *Evaluator) copyFile(local string, remote string, expand bool) {
+func (e *Evaluator) copyFile(local string, remote string, expand bool) bool {
 
+	//
+	// Did we result in a change?
+	//
+	changed := false
+
+	if e.Verbose {
+		if expand {
+			fmt.Printf("CopyTemplate(\"%s\",\"%s\")\n", local, remote)
+		} else {
+			fmt.Printf("CopyFile(\"%s\",\"%s\")\n", local, remote)
+		}
+
+	}
 	//
 	// If we're expanding templates then do that first of all.
 	//
@@ -496,7 +586,6 @@ func (e *Evaluator) copyFile(local string, remote string, expand bool) {
 		// is a fatal error.
 		//
 		os.Exit(11)
-		return
 	}
 
 	//
@@ -522,7 +611,7 @@ func (e *Evaluator) copyFile(local string, remote string, expand bool) {
 			if expand {
 				os.Remove(local)
 			}
-			return
+			return changed
 		}
 
 		if hashRemote != hashLocal {
@@ -530,12 +619,11 @@ func (e *Evaluator) copyFile(local string, remote string, expand bool) {
 				fmt.Printf("\tFile on remote host needs replacing.\n")
 			}
 
-			e.Changed = true
+			changed = true
 		} else {
 			if e.Verbose {
 				fmt.Printf("\tFile on remote host doesn't need to be changed.\n")
 			}
-			e.Changed = false
 		}
 	} else {
 
@@ -544,16 +632,14 @@ func (e *Evaluator) copyFile(local string, remote string, expand bool) {
 		// assume thati t doesn't exist
 		//
 		if strings.Contains(err.Error(), "not exist") {
-			e.Changed = true
-		} else {
-			e.Changed = false
+			changed = true
 		}
 	}
 
 	//
-	// Upload the file, if it didn't change
+	// Upload the file, if it changed
 	//
-	if e.Changed == true {
+	if changed {
 		err = e.Connection.Upload(local, remote)
 		if err != nil {
 			fmt.Printf("Failed to upload '%s' to '%s': %s\n", local, remote, err.Error())
@@ -565,7 +651,7 @@ func (e *Evaluator) copyFile(local string, remote string, expand bool) {
 				os.Remove(local)
 			}
 
-			return
+			return changed
 		}
 	}
 	// If expanding variables we replaced our
@@ -574,6 +660,8 @@ func (e *Evaluator) copyFile(local string, remote string, expand bool) {
 	if expand {
 		os.Remove(local)
 	}
+
+	return changed
 }
 
 // expandString expands tokens of the form "${blah}" into the
