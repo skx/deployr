@@ -58,7 +58,7 @@ Run "chmod 755 /srv/puppet-summary/puppet*"
 # Finally we need to make sure there is a systemd unit-file in-place which
 # will start the service
 #
-CopyFile lib/systemd/system/*.service /lib/systemd/system/puppet-summary.service
+CopyFile lib/systemd/system/*.service /lib/systemd/system/
 IfChanged "systemctl daemon-reload"
 IfChanged "systemctl enable puppet-summary.service"
 
