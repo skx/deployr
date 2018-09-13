@@ -431,7 +431,7 @@ func (e *Evaluator) copyFiles(pattern string, destination string, expand bool) b
 	//
 	// Did we receive more than one file?
 	//
-	if len(files) == 1 {
+	if len(files) == 1 && files[0] == pattern {
 
 		//
 		// OK just copying a single file.
