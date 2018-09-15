@@ -25,7 +25,7 @@ If you want to keep your deployment recipes automatable, and reproducible, then 
 
 "Competing" systems tend to offer more facilities, such as the ability to add Unix users, setup MySQL database, add cron-entries, etc.  Although it isn't impossible to do those things in `deployr` it is not as natural as other solutions.  (For example you can add a cron-entry by uploading a file to `/etc/cron.d/my-service`, or you can add a user via `Run adduser bob 2>/dev/null`.)
 
-One obvious facility that most similar systems, such as ansible, offer is the ability to perform looping operations, and comparisions.  We don't offer that and I'm not sure we ever will - even if we did add the ability to add cronjobs, etc.
+One obvious facility that most similar systems, such as ansible, offer is the ability to perform looping operations, and comparisons.  We don't offer that and I'm not sure we ever will - even if we did add the ability to add cronjobs, etc.
 
 
 
@@ -114,7 +114,7 @@ that is not supported.
 
 The `IfChanged` primitive will regard a previous copy operation as having
 resulted in a change if any single file changes during the run of a copy
-operation that invovles a glob.
+operation that involves a glob.
 
 
 ## Variables
