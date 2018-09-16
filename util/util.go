@@ -39,3 +39,20 @@ func HashFile(filePath string) (string, error) {
 
 	return returnSHA1String, nil
 }
+
+// HasSshAgent reports whether the SSH agent is available
+func HasSshAgent() bool {
+	authsock, ok := os.LookupEnv("SSH_AUTH_SOCK")
+	if !ok {
+		return false
+	}
+	if dirent, err := os.Stat(authsock); err != nil {
+		if os.IsNotExist(err) {
+			return false
+		}
+		if dirent.Mode() & os.ModeSocket == 0 {
+			return false
+		}
+	}
+	return true
+}
