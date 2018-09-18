@@ -75,6 +75,19 @@ Each specified recipe is parsed and the primitives inside them are then executed
   * The sudo example found beneath [examples/sudo/](examples/sudo/) demonstrates usage.
 
 
+
+### Authentication
+
+Public-Key authentication is only supported mechanism for connecting to a remote host, or remote hosts.  There is zero support for authentication via passwords.
+
+By default `~/.ssh/id_rsa` will be used as the key to connect with, but if you prefer you can specify a different private-key with the `-identity` flag to the run sub-command:
+
+    $ deployr run -identity ~/.ssh/host
+
+In addition to using a key specified via the command-line deployr also supports the use of `ssh-agent`.  Simply set the environmental-variable `SSH_AUTH_SOCKET` to the path of your agent's socket.
+
+
+
 ### Examples
 
 There are several examples included beneath [examples/](examples/), the shortest one [examples/simple/](examples/simple/) is a particularly good recipe to examine to get a feel for the system:
