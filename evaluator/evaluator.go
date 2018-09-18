@@ -7,7 +7,6 @@
 package evaluator
 
 import (
-	"bufio"
 	"bytes"
 	"fmt"
 	"io/ioutil"
@@ -16,12 +15,14 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"syscall"
 	"text/template"
 	"time"
 
 	"github.com/sfreiberg/simplessh"
 	"github.com/skx/deployr/statement"
 	"github.com/skx/deployr/util"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 // Evaluator holds our internal state.
@@ -175,13 +176,12 @@ func (e *Evaluator) Run() error {
 	if sudo {
 		fmt.Printf("Please enter your password for sudo: ")
 
-		reader := bufio.NewReader(os.Stdin)
-		text, err := reader.ReadString('\n')
-
+		text, err := terminal.ReadPassword(int(syscall.Stdin))
 		if err != nil {
 			return err
 		}
-		sudoPassword = text
+		fmt.Printf("\n")
+		sudoPassword = string(text)
 	}
 
 	//
