@@ -142,7 +142,11 @@ func (e *Evaluator) ConnectTo(target string) error {
 	//
 	// Finally connect.
 	//
-	e.Connection, err = simplessh.ConnectWithKeyFile(destination, user, e.Identity)
+	if util.HasSshAgent() {
+		e.Connection, err = simplessh.ConnectWithAgent(destination, user)
+	} else {
+		e.Connection, err = simplessh.ConnectWithKeyFile(destination, user, e.Identity)
+	}
 	if err != nil {
 		return err
 	}
