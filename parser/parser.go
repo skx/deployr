@@ -232,7 +232,7 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 			s.Arguments = args
 
 			//
-			// Perserve the SUDO state
+			// Preserve the SUDO state
 			//
 			s.Sudo = sudo
 			sudo = false
@@ -270,7 +270,7 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 			s.Arguments = args
 
 			//
-			// Perserve the SUDO state
+			// Preserve the SUDO state
 			//
 			s.Sudo = sudo
 			sudo = false
