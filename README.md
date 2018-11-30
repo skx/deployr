@@ -27,6 +27,8 @@ If you want to keep your deployment recipes automatable, and reproducible, then 
 
 One obvious facility that most similar systems, such as ansible, offer is the ability to perform looping operations, and comparisons.  We don't offer that and I'm not sure we ever will - even if we did add the ability to add cronjobs, etc.
 
+In short think of this as an alternative to using a bash-script, which invokes scp/rsync/ssh.  It is not going to compete with ansible, or similar.  (Though it is reasonably close in spirit to `fabric` albeit with a smaller set of primitives.)
+
 
 
 ## Installation
