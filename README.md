@@ -34,7 +34,6 @@ One obvious facility that most similar systems, such as ansible, offer is the ab
 Providing you have a working go-installation you should be able to install this tool by running:
 
     go get -u  github.com/skx/deployr
-    go install github.com/skx/deployr
 
 > **NOTE**: If you've previously downloaded the code this will update your installation to the most recent available version.
 
