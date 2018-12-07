@@ -23,7 +23,7 @@ DeployTo root@master.steve.org.uk:2222
 #
 # Set the release version as a variable named "RELEASE".
 #
-Set RELEASE "1.2"
+Set RELEASE "1.3"
 
 #
 # Now that RELEASE is defined it can be used as ${RELEASE} in the rest of
