@@ -1,4 +1,3 @@
-[![Travis CI](https://img.shields.io/travis/skx/deployr/master.svg?style=flat-square)](https://travis-ci.org/skx/deployr)
 [![Go Report Card](https://goreportcard.com/badge/github.com/skx/deployr)](https://goreportcard.com/report/github.com/skx/deployr)
 [![license](https://img.shields.io/github/license/skx/deployr.svg)](https://github.com/skx/deployr/blob/master/LICENSE)
 [![Release](https://img.shields.io/github/release/skx/deployr.svg)](https://github.com/skx/deployr/releases/latest)
