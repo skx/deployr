@@ -42,7 +42,7 @@ func (l *Lexer) readChar() {
 		l.ch = l.characters[l.readPosition]
 	}
 	l.position = l.readPosition
-	l.readPosition += 1
+	l.readPosition++
 }
 
 // NextToken to read next token, skipping the white space.
@@ -120,7 +120,7 @@ func (l *Lexer) readString() (string, error) {
 			break
 		}
 		if l.ch == rune(0) {
-			return "", errors.New("Unterminated string!")
+			return "", errors.New("unterminated string")
 		}
 
 		//

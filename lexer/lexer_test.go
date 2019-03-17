@@ -142,7 +142,7 @@ Run "Steve`
 		expectedLiteral string
 	}{
 		{token.RUN, "Run"},
-		{token.ILLEGAL, "Unterminated string!"},
+		{token.ILLEGAL, "unterminated string"},
 		{token.EOF, ""},
 	}
 	l := New(input)
