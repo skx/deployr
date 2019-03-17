@@ -40,8 +40,8 @@ func HashFile(filePath string) (string, error) {
 	return returnSHA1String, nil
 }
 
-// HasSshAgent reports whether the SSH agent is available
-func HasSshAgent() bool {
+// HasSSHAgent reports whether the SSH agent is available
+func HasSSHAgent() bool {
 	authsock, ok := os.LookupEnv("SSH_AUTH_SOCK")
 	if !ok {
 		return false
@@ -50,7 +50,7 @@ func HasSshAgent() bool {
 		if os.IsNotExist(err) {
 			return false
 		}
-		if dirent.Mode() & os.ModeSocket == 0 {
+		if dirent.Mode()&os.ModeSocket == 0 {
 			return false
 		}
 	}

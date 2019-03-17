@@ -3,9 +3,6 @@
 # The basename of our binary
 BASE="deployr"
 
-# Get the dependencies
-go mod init
-
 D=$(pwd)
 
 #

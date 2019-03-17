@@ -78,7 +78,7 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 			// That might be a bogus number (if we supported numbers),
 			// or an unterminated string.
 			//
-			return result, fmt.Errorf("Error received from the lexer - %s\n", tok.Literal)
+			return result, fmt.Errorf("error received from the lexer - %s", tok.Literal)
 		case "IDENT":
 			//
 			// If we find a bare-ident which is not an argument
@@ -90,7 +90,7 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 			//
 			// Either way this is an error.
 			//
-			return result, fmt.Errorf("Found unexpected identifier '%s'\n", tok.Literal)
+			return result, fmt.Errorf("found unexpected identifier '%s'", tok.Literal)
 		case "STRING":
 			//
 			// If we find a bare-string which is not an argument
@@ -102,7 +102,7 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 			//
 			// Either way this is an error.
 			//
-			return result, fmt.Errorf("Found unexpected string '%s'\n", tok.Literal)
+			return result, fmt.Errorf("found unexpected string '%s'", tok.Literal)
 		case "CopyTemplate":
 			//
 			// We should have two arguments to CopyTemplate:
@@ -328,7 +328,7 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 			// If we hit this point there is a token-type we
 			// did not handle.
 			//
-			return nil, fmt.Errorf("Unhandled statement - %v\n", tok)
+			return nil, fmt.Errorf("unhandled statement - %v", tok)
 
 		}
 	}

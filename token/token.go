@@ -1,11 +1,11 @@
 package token
 
-// TokenType is a string
-type TokenType string
+// Type is a string
+type Type string
 
 // Token struct represent the lexer token
 type Token struct {
-	Type    TokenType
+	Type    Type
 	Literal string
 }
 
@@ -17,28 +17,28 @@ const (
 	STRING  = "STRING"
 
 	// Our keywords.
-	COPY_FILE     = "CopyFile"
-	COPY_TEMPLATE = "CopyTemplate"
-	DEPLOY_TO     = "DeployTo"
-	IF_CHANGED    = "IfChanged"
-	RUN           = "Run"
-	SET           = "Set"
-	SUDO          = "Sudo"
+	COPYFILE     = "CopyFile"
+	COPYTEMPLATE = "CopyTemplate"
+	DEPLOYTO     = "DeployTo"
+	IFCHANGED    = "IfChanged"
+	RUN          = "Run"
+	SET          = "Set"
+	SUDO         = "Sudo"
 )
 
 // keywords holds our reversed keywords
-var keywords = map[string]TokenType{
-	"CopyFile":     COPY_FILE,
-	"CopyTemplate": COPY_TEMPLATE,
-	"DeployTo":     DEPLOY_TO,
-	"IfChanged":    IF_CHANGED,
+var keywords = map[string]Type{
+	"CopyFile":     COPYFILE,
+	"CopyTemplate": COPYTEMPLATE,
+	"DeployTo":     DEPLOYTO,
+	"IfChanged":    IFCHANGED,
 	"Run":          RUN,
 	"Set":          SET,
 	"Sudo":         SUDO,
 }
 
 // LookupIdentifier used to determinate whether identifier is keyword nor not
-func LookupIdentifier(identifier string) TokenType {
+func LookupIdentifier(identifier string) Type {
 	if tok, ok := keywords[identifier]; ok {
 		return tok
 	}

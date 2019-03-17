@@ -121,7 +121,7 @@ func (r *runCmd) Run(file string) {
 	// Set the target, if we've been given one.
 	//
 	if r.target != "" {
-		err := e.ConnectTo(r.target)
+		err = e.ConnectTo(r.target)
 		if err != nil {
 			fmt.Printf("Failed to connect to target: %s\n", err.Error())
 			return

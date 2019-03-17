@@ -34,7 +34,7 @@ func NewFakeLexer(t []token.Token) *FakeLexer {
 //
 func (f *FakeLexer) NextToken() token.Token {
 	t := f.Tokens[f.Offset]
-	f.Offset += 1
+	f.Offset++
 	return t
 }
 
@@ -75,7 +75,7 @@ func TestEOF(t *testing.T) {
 //
 // "STRING" is valid, "IDENT" is bogus.
 //
-func testSingleArgument(t *testing.T, tokenName token.TokenType, validType token.TokenType, bogusType token.TokenType) {
+func testSingleArgument(t *testing.T, tokenName token.Type, validType token.Type, bogusType token.Type) {
 
 	//
 	// The fake-program which should be valid
@@ -161,7 +161,7 @@ func TestCopy(t *testing.T) {
 	// We'll repeat our tests with both "CopyFile" and
 	// "CopyTemplate"
 	//
-	terms := []token.TokenType{"CopyFile", "CopyTemplate"}
+	terms := []token.Type{"CopyFile", "CopyTemplate"}
 
 	for _, term := range terms {
 
@@ -327,7 +327,7 @@ func TestDefault(t *testing.T) {
 	if err == nil {
 		t.Fatalf("We expected an error, but saw none!")
 	}
-	if !strings.Contains(err.Error(), "Unhandled") {
+	if !strings.Contains(err.Error(), "unhandled") {
 		t.Fatalf("We received an error, but got the wrong one: %s\n", err.Error())
 	}
 }
