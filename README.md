@@ -3,6 +3,25 @@
 [![Release](https://img.shields.io/github/release/skx/deployr.svg)](https://github.com/skx/deployr/releases/latest)
 
 
+
+Table of Contents
+=================
+
+* [deployr](#deployr)
+* [Installation &amp; Dependencies](#installation--dependencies)
+  * [Source Installation go &lt;=  1.11](#source-installation-go---111)
+  * [Source installation go  &gt;= 1.12](#source-installation-go---112)
+* [Overview](#overview)
+  * [Authentication](#authentication)
+  * [Examples](#examples)
+  * [File Globs](#file-globs)
+* [Variables](#variables)
+  * [Predefined Variables](#predefined-variables)
+* [Template Expansion](#template-expansion)
+* [Missing Primitives?](#missing-primitives)
+* [Github Setup](#github-setup)
+
+
 # deployr
 
 `deployr` is a simple utility which is designed to allow you to easily automate simple application-deployment via SSH.
@@ -30,13 +49,25 @@ In short think of this as an alternative to using a bash-script, which invokes s
 
 
 
-## Installation
+## Installation & Dependencies
 
-Providing you have a working go-installation you should be able to install this tool by running:
+There are two ways to install this project from source, which depend on the version of the [go](https://golang.org/) version you're using.
 
-    go get -u  github.com/skx/deployr
 
-> **NOTE**: If you've previously downloaded the code this will update your installation to the most recent available version.
+### Source Installation go <=  1.11
+
+If you're using `go` before 1.11 then the following command should fetch/update `deployr`, and install it upon your system:
+
+     $ go get -u github.com/skx/deployr
+
+### Source installation go  >= 1.12
+
+If you're using a more recent version of `go` (which is _highly_ recommended), you need to clone to a directory which is not present upon your `GOPATH`:
+
+    git clone https://github.com/skx/deployr
+    cd deployr
+    go install
+
 
 If you don't have a golang environment setup you should be able to download a binary for GNU/Linux from [our release page](https://github.com/skx/deployr/releases).
 
