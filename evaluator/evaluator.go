@@ -201,7 +201,7 @@ func (e *Evaluator) Run() error {
 			// Ensure we're connected.
 			//
 			if e.Connection == nil {
-				return fmt.Errorf("Tried to run a command, but not connected to a target!")
+				return fmt.Errorf("tried to run a command, but not connected to a target")
 			}
 
 			//
@@ -225,7 +225,7 @@ func (e *Evaluator) Run() error {
 			// Ensure we're connected.
 			//
 			if e.Connection == nil {
-				return fmt.Errorf("Tried to run a command, but not connected to a target!")
+				return fmt.Errorf("tried to run a command, but not connected to a target")
 			}
 
 			//
@@ -277,7 +277,7 @@ func (e *Evaluator) Run() error {
 			// Ensure we're connected.
 			//
 			if e.Connection == nil {
-				return fmt.Errorf("Tried to run a command, but not connected to a target!")
+				return fmt.Errorf("tried to run a command, but not connected to a target")
 			}
 
 			//
@@ -311,7 +311,7 @@ func (e *Evaluator) Run() error {
 				result, err = e.Connection.Exec(cmd)
 			}
 			if err != nil {
-				return (fmt.Errorf("Failed to run command '%s': %s\n", cmd, err.Error()))
+				return (fmt.Errorf("failed to run command '%s': %s", cmd, err.Error()))
 			}
 
 			//
@@ -326,7 +326,7 @@ func (e *Evaluator) Run() error {
 			// Ensure we're connected.
 			//
 			if e.Connection == nil {
-				return fmt.Errorf("Tried to run a command, but not connected to a target!")
+				return fmt.Errorf("tried to run a command, but not connected to a target")
 			}
 
 			cmd := e.expandString(statement.Arguments[0].Literal)
@@ -358,7 +358,7 @@ func (e *Evaluator) Run() error {
 				result, err = e.Connection.Exec(cmd)
 			}
 			if err != nil {
-				return (fmt.Errorf("Failed to run command '%s': %s\n", cmd, err.Error()))
+				return (fmt.Errorf("failed to run command '%s': %s", cmd, err.Error()))
 			}
 
 			//
@@ -390,7 +390,7 @@ func (e *Evaluator) Run() error {
 			//
 			break
 		default:
-			return fmt.Errorf("Unhandled statement - %v\n", statement.Token)
+			return fmt.Errorf("unhandled statement - %v", statement.Token)
 		}
 	}
 
