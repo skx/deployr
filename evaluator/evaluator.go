@@ -581,7 +581,9 @@ func (e *Evaluator) copyFile(local string, remote string, expand bool) bool {
 	//
 	// NOTE: We do this after we've expanded any variables.
 	//
-	hashLocal, err := util.HashFile(local)
+	var hashLocal string
+	var err error
+	hashLocal, err = util.HashFile(local)
 	if err != nil {
 		fmt.Printf("Failed to hash local file %s\n", err.Error())
 
@@ -605,7 +607,8 @@ func (e *Evaluator) copyFile(local string, remote string, expand bool) bool {
 		// We had no error - so we now have the
 		// remote file copied here.
 		//
-		hashRemote, err := util.HashFile(tmpfile.Name())
+		var hashRemote string
+		hashRemote, err = util.HashFile(tmpfile.Name())
 		if err != nil {
 			fmt.Printf("Failed to hash remote file %s\n", err.Error())
 
