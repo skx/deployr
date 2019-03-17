@@ -12,7 +12,7 @@ func TestSomeStrings(t *testing.T) {
 	input := `"Steve" "Kemp"`
 
 	tests := []struct {
-		expectedType    token.TokenType
+		expectedType    token.Type
 		expectedLiteral string
 	}{
 		{token.STRING, "Steve"},
@@ -36,7 +36,7 @@ func TestStringEscape(t *testing.T) {
 	input := `"Steve\n\r\\" "Kemp\n\t\n" "Inline \"quotes\"."`
 
 	tests := []struct {
-		expectedType    token.TokenType
+		expectedType    token.Type
 		expectedLiteral string
 	}{
 		{token.STRING, "Steve\n\r\\"},
@@ -63,7 +63,7 @@ func TestComments(t *testing.T) {
 # This is another comment`
 
 	tests := []struct {
-		expectedType    token.TokenType
+		expectedType    token.Type
 		expectedLiteral string
 	}{
 		{token.STRING, "Steve"},
@@ -88,7 +88,7 @@ func TestShebang(t *testing.T) {
 # This is another comment`
 
 	tests := []struct {
-		expectedType    token.TokenType
+		expectedType    token.Type
 		expectedLiteral string
 	}{
 		{token.STRING, "Steve"},
@@ -113,7 +113,7 @@ Run "Steve"
 # This is another comment`
 
 	tests := []struct {
-		expectedType    token.TokenType
+		expectedType    token.Type
 		expectedLiteral string
 	}{
 		{token.RUN, "Run"},
@@ -138,7 +138,7 @@ func TestUnterminatedString(t *testing.T) {
 Run "Steve`
 
 	tests := []struct {
-		expectedType    token.TokenType
+		expectedType    token.Type
 		expectedLiteral string
 	}{
 		{token.RUN, "Run"},
@@ -165,7 +165,7 @@ which continues"
 `
 
 	tests := []struct {
-		expectedType    token.TokenType
+		expectedType    token.Type
 		expectedLiteral string
 	}{
 		{token.RUN, "Run"},

@@ -75,7 +75,7 @@ func TestEOF(t *testing.T) {
 //
 // "STRING" is valid, "IDENT" is bogus.
 //
-func testSingleArgument(t *testing.T, tokenName token.TokenType, validType token.TokenType, bogusType token.TokenType) {
+func testSingleArgument(t *testing.T, tokenName token.Type, validType token.Type, bogusType token.Type) {
 
 	//
 	// The fake-program which should be valid
@@ -161,7 +161,7 @@ func TestCopy(t *testing.T) {
 	// We'll repeat our tests with both "CopyFile" and
 	// "CopyTemplate"
 	//
-	terms := []token.TokenType{"CopyFile", "CopyTemplate"}
+	terms := []token.Type{"CopyFile", "CopyTemplate"}
 
 	for _, term := range terms {
 
