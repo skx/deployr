@@ -25,7 +25,7 @@ func New(input string) *Lexer {
 // Dump outputs the complete stream of tokens from the lexer,
 // consuming all input as it does so.
 func (l *Lexer) Dump() {
-	for true {
+	for {
 		tok := l.NextToken()
 		fmt.Printf("%v\n", tok)
 		if tok.Type == "EOF" {
