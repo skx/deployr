@@ -127,7 +127,7 @@ func testSingleArgument(t *testing.T, tokenName token.Type, validType token.Type
 	if err == nil {
 		t.Fatalf("Expected to receive an error got none\n")
 	}
-	if !strings.Contains(err.Error(), "Expected "+string(validType)) {
+	if !strings.Contains(err.Error(), "expected "+string(validType)) {
 		t.Fatalf("We received an error, but not the correct one: %s\n", err.Error())
 	}
 
