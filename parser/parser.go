@@ -135,7 +135,6 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 			s := statement.Statement{Token: tok}
 			s.Arguments = args
 			result = append(result, s)
-			break
 
 		case "CopyFile":
 
@@ -170,7 +169,6 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 			s := statement.Statement{Token: tok}
 			s.Arguments = args
 			result = append(result, s)
-			break
 
 		case "DeployTo":
 			//
@@ -200,7 +198,6 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 			s := statement.Statement{Token: tok}
 			s.Arguments = args
 			result = append(result, s)
-			break
 
 		case "IfChanged":
 
@@ -238,7 +235,6 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 			sudo = false
 
 			result = append(result, s)
-			break
 
 		case "Run":
 
@@ -276,7 +272,6 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 			sudo = false
 
 			result = append(result, s)
-			break
 
 		case "Set":
 
@@ -309,11 +304,9 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 			s := statement.Statement{Token: tok}
 			s.Arguments = args
 			result = append(result, s)
-			break
 
 		case "Sudo":
 			sudo = true
-			break
 
 		case "EOF":
 
@@ -321,7 +314,6 @@ func (p *Parser) Parse() ([]statement.Statement, error) {
 			// This causes our parsing-loop to terminate.
 			//
 			run = false
-			break
 		default:
 
 			//
@@ -344,7 +336,7 @@ func (p *Parser) GetArguments(expected []token.Token) ([]token.Token, error) {
 
 		next := p.Tokenizer.NextToken()
 		if next.Type != arg.Type {
-			return nil, fmt.Errorf("Expected %v as argument %d - Got %v", arg.Type, i+1, next.Type)
+			return nil, fmt.Errorf("expected %v as argument %d - Got %v", arg.Type, i+1, next.Type)
 		}
 
 		ret = append(ret, next)

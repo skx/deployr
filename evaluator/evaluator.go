@@ -217,7 +217,6 @@ func (e *Evaluator) Run() error {
 				break
 			}
 			e.Changed = e.copyFiles(src, dst, true)
-			break
 
 		case "CopyFile":
 
@@ -243,7 +242,6 @@ func (e *Evaluator) Run() error {
 			}
 
 			e.Changed = e.copyFiles(src, dst, false)
-			break
 
 		case "DeployTo":
 
@@ -261,15 +259,13 @@ func (e *Evaluator) Run() error {
 				return err
 			}
 
-			break
-
 		case "IfChanged":
 
 			//
 			// If the previous copy didn't change then we can
 			// just skip this command.
 			//
-			if e.Changed == false {
+			if !e.Changed {
 				break
 			}
 
@@ -318,7 +314,6 @@ func (e *Evaluator) Run() error {
 			// Show the output
 			//
 			fmt.Printf("%s", result)
-			break
 
 		case "Run":
 
@@ -366,8 +361,6 @@ func (e *Evaluator) Run() error {
 			//
 			fmt.Printf("%s", result)
 
-			break
-
 		case "Set":
 
 			//
@@ -381,14 +374,11 @@ func (e *Evaluator) Run() error {
 			}
 			e.Variables[key] = val
 
-			break
-
 		case "Sudo":
 
 			//
 			// This is an error?
 			//
-			break
 		default:
 			return fmt.Errorf("unhandled statement - %v", statement.Token)
 		}
@@ -679,7 +669,7 @@ func (e *Evaluator) expandString(in string) string {
 	// Expand any variables which have previously been
 	// declared.
 	//
-	re := regexp.MustCompile("\\$\\{([^\\}]+)\\}")
+	re := regexp.MustCompile(`\$\{([^\}]+)\}`)
 	in = re.ReplaceAllStringFunc(in, func(in string) string {
 
 		in = strings.TrimPrefix(in, "${")
