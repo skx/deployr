@@ -423,6 +423,14 @@ func (e *Evaluator) copyFiles(pattern string, destination string, expand bool) b
 	}
 
 	//
+	// Did we fail to find file(s)?
+	//
+	if len(files) < 1 {
+		fmt.Printf("Failed to find file(s) matching %s\n", pattern)
+		return false
+	}
+
+	//
 	// Did we receive more than one file?
 	//
 	if len(files) == 1 && files[0] == pattern {
