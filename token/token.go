@@ -1,3 +1,5 @@
+// Package token contains the token-types which our lexer produces,
+// and which our parser understands.
 package token
 
 // Type is a string

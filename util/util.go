@@ -1,3 +1,4 @@
+// Package util contains a couple of utility methods.
 package util
 
 import (

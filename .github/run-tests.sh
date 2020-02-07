@@ -6,9 +6,9 @@ go get -u golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow
 go get -u honnef.co/go/tools/cmd/staticcheck
 
 
-# Run the static-check tool - we ignore errors in goserver/static.go
+# Run the static-check tool.
 t=$(mktemp)
-staticcheck -checks all ./... | grep -v "have a package comment" > $t
+staticcheck -checks all ./... > $t
 if [ -s $t ]; then
     echo "Found errors via 'staticcheck'"
     cat $t
