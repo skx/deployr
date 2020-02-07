@@ -1,8 +1,7 @@
+// Package parser is the package which parses our input.
 //
 // Given a lexer, wrapping a given input-file, we parse tokens from
-// it into a series of statements.
-//
-
+// it into a series of statements which we then return for processing.
 package parser
 
 import (
@@ -12,6 +11,7 @@ import (
 	"github.com/skx/deployr/token"
 )
 
+// tokenzer is the interface for our tokenzier.
 //
 // We expect to consume tokens from our Lexer, but we use a layer
 // of indirection by constructing our parser with an interface

@@ -1,9 +1,6 @@
-//
-// Evaluator is the core of our run-time.
+// Package evaluator is the core of our run-time.
 //
 // Given a parsed series of statements we execute each of them in turn.
-//
-
 package evaluator
 
 import (

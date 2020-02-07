@@ -1,3 +1,5 @@
+// Package lexer contains a simple lexer for reading an input-string
+// and converting it into a series of tokens.
 package lexer
 
 import (
