@@ -181,7 +181,7 @@ It is possible to override the value of a particular variable via a command-line
 
     $ deployr run --set "ENVIRONMENT=PRODUCTION" ...
 
-If you do this any attempt to `Set` the variable inside the recipe itself will be silently ignored.  (i.e. A variable which is set on the command-line will become essentially read-only.)   This is useful if you have a recipe where the only real difference is the set of configuration files, and the destination host.  For example you could write all your copies like so:
+If you do this any attempt to `Set` the variable inside the recipe itself will be silently ignored.  (i.e. A variable which is set on the command-line will become essentially read-only.) This is useful if you have a recipe where the only real difference is the set of configuration files, and the destination host. For example you could write all your copies like so:
 
     #
     # Lack of recursive copy is a pain here.
@@ -202,7 +202,17 @@ Then have a tree of files:
               ├── apache2.conf
               └── redis.conf
 
+Another case where this come in handy is when dealing the secrets. Pass your secrets via command-line arguments instead of setting them in the recipe so you don't commit them by mistake, for example:
+        
+        $ deployr run --set "API_KEY=foobar" ...
+                
+Then use the `API_KEY`:
 
+        Run "curl api.example.com/releases/latest -H 'Authorization: Bearer ${API_KEY}'"
+        
+In a CI environnement, use command-line arguments to retrieve environnement variables available in the CI.
+        
+        $ deployr run --set "RELEASE=$CI_COMMIT_TAG" ...
 
 ### Predefined Variables
 
@@ -247,7 +257,7 @@ which means you can access values like so:
 In short you write `{{get "variable-name-here"}}` and the value of the variable
 will be output inline.
 
-Any variable defined with `Set` will be available to you, as well as the
+Any variable defined with `Set` (or via a command-line argument) will be available to you, as well as the
 [predefined variables](#predefined-variables) noted above.
 
 
