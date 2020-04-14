@@ -19,6 +19,7 @@ Table of Contents
   * [Predefined Variables](#predefined-variables)
 * [Template Expansion](#template-expansion)
 * [Missing Primitives?](#missing-primitives)
+  * [Alternatives](#alternatives)
 * [Github Setup](#github-setup)
 
 
@@ -203,15 +204,15 @@ Then have a tree of files:
               └── redis.conf
 
 Another case where this come in handy is when dealing the secrets. Pass your secrets via command-line arguments instead of setting them in the recipe so you don't commit them by mistake, for example:
-        
+
         $ deployr run --set "API_KEY=foobar" ...
-                
+
 Then use the `API_KEY`:
 
         Run "curl api.example.com/releases/latest -H 'Authorization: Bearer ${API_KEY}'"
-        
+
 In a CI environnement, use command-line arguments to retrieve environnement variables available in the CI.
-        
+
         $ deployr run --set "RELEASE=$CI_COMMIT_TAG" ...
 
 ### Predefined Variables
@@ -266,6 +267,23 @@ Any variable defined with `Set` (or via a command-line argument) will be availab
 
 If there are primitives you think would be useful to add then please do
 [file a bug](http://github.com/skx/deployr/issues).
+
+
+### Alternatives
+
+There are many alternatives to this simple approach.  The most obvious two
+would be:
+
+* [ansible](https://www.ansible.com/)
+  * Uses YAML to let you run commands on multiple remote hosts via SSH.
+  * Very featureful, but also a bit hard to be readable due to the YAML use.
+* [fabric](http://www.fabfile.org/)
+  * Another Python-based project, which defines some simple primitive functions such as `run` and `put` to run commands, and upload files respectively.
+
+As a very simple alternative I put together [marionette](https://github.com/skx/marionette/) which allows running commands, and setting file-content, but this works on the __local__ system only - no SSH involved.
+
+For large-scale deployments you'll probably want to consider Puppet, Chef, or something more established and powerful.  Still this system has its place.
+
 
 
 ## Github Setup
