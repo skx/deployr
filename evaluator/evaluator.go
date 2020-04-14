@@ -304,7 +304,7 @@ func (e *Evaluator) Run() error {
 				result, err = e.Connection.Exec(cmd)
 			}
 			if err != nil {
-				return (fmt.Errorf("failed to run command '%s': %s", cmd, err.Error()))
+				return (fmt.Errorf("failed to run command '%s': %s\n%s", cmd, err.Error(), result))
 			}
 
 			//
@@ -350,7 +350,7 @@ func (e *Evaluator) Run() error {
 				result, err = e.Connection.Exec(cmd)
 			}
 			if err != nil {
-				return (fmt.Errorf("failed to run command '%s': %s", cmd, err.Error()))
+				return (fmt.Errorf("failed to run command '%s': %s\n%s", cmd, err.Error(), result))
 			}
 
 			//
