@@ -11,7 +11,7 @@ import (
 	"github.com/skx/deployr/token"
 )
 
-// tokenzer is the interface for our tokenzier.
+// tokenizer is the interface for our tokenzier.
 //
 // We expect to consume tokens from our Lexer, but we use a layer
 // of indirection by constructing our parser with an interface
