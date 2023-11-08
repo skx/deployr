@@ -117,6 +117,7 @@ By default `~/.ssh/id_rsa` will be used as the key to connect with, but if you p
     $ deployr run -identity ~/.ssh/host
 
 In addition to using a key specified via the command-line deployr also supports the use of `ssh-agent`.  Simply set the environmental-variable `SSH_AUTH_SOCK` to the path of your agent's socket.
+On Windows deployr supports `pageant`, which is a Windows-specific implementation of SSH Agent. If pageant is running, deployr will detect it and use it for authentication.
 
 
 
