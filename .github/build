@@ -3,6 +3,9 @@
 # The basename of our binary
 BASE="deployr"
 
+# I don't even ..
+go env -w GOFLAGS="-buildvcs=false"
+
 D=$(pwd)
 
 #
