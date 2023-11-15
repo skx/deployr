@@ -19,7 +19,7 @@ import (
 	"github.com/sfreiberg/simplessh"
 	"github.com/skx/deployr/statement"
 	"github.com/skx/deployr/util"
-	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/term"
 )
 
 // Evaluator holds our internal state.
@@ -89,7 +89,6 @@ func (e *Evaluator) SetVerbose(verb bool) {
 // If a connection is already open then it is maintained, and not replaced.
 // This allows the command-line to override the destination which might be
 // baked into a configuration-recipe.
-//
 func (e *Evaluator) ConnectTo(target string) error {
 	var err error
 
@@ -173,7 +172,7 @@ func (e *Evaluator) Run() error {
 	if sudo {
 		fmt.Printf("Please enter your password for sudo: ")
 
-		text, err := terminal.ReadPassword(int(syscall.Stdin))
+		text, err := term.ReadPassword(int(syscall.Stdin))
 		if err != nil {
 			return err
 		}
@@ -401,7 +400,6 @@ func (e *Evaluator) Run() error {
 // system to the remote host.
 //
 // It might be called with a glob, or with a single file.
-//
 func (e *Evaluator) copyFiles(pattern string, destination string, expand bool) bool {
 
 	//
@@ -487,7 +485,6 @@ func (e *Evaluator) copyFiles(pattern string, destination string, expand bool) b
 // * It only copies files if the local/remote differ.
 //
 // * It optionally expands template-variables.
-//
 func (e *Evaluator) copyFile(local string, remote string, expand bool) bool {
 
 	//
