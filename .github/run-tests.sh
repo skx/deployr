@@ -1,9 +1,13 @@
 #!/bin/sh
 
-# Install tools to test our code-quality.
-go get -u golang.org/x/lint/golint
-go get -u golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow
-go get -u honnef.co/go/tools/cmd/staticcheck
+
+# I don't even ..
+go env -w GOFLAGS="-buildvcs=false"
+
+# Install the lint-tool, and the shadow-tool
+go install golang.org/x/lint/golint@latest
+go install golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow@latest
+go install honnef.co/go/tools/cmd/staticcheck@latest
 
 
 # Run the static-check tool.
