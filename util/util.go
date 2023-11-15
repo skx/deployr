@@ -43,6 +43,10 @@ func HashFile(filePath string) (string, error) {
 
 // HasSSHAgent reports whether the SSH agent is available
 func HasSSHAgent() bool {
+	if isPageantAvailable() {
+		return true
+	}
+
 	authsock, ok := os.LookupEnv("SSH_AUTH_SOCK")
 	if !ok {
 		return false
