@@ -7,7 +7,6 @@ require (
 	github.com/google/subcommands v1.2.0
 	github.com/pkg/sftp v1.13.6 // indirect
 	github.com/sfreiberg/simplessh v0.0.0-20220719182921-185eafd40485
-	golang.org/x/crypto v0.26.0 // indirect
-	golang.org/x/sys v0.24.0 // indirect
-	golang.org/x/term v0.23.0
+	golang.org/x/crypto v0.31.0 // indirect
+	golang.org/x/term v0.27.0
 )
